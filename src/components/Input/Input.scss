@@ -1,0 +1,32 @@
+.Input {
+  text-align: left;
+  justify-content: left;
+  label {
+    font-size: 12px;
+    font-weight: var(--font-semibold);
+    color: var(--color-primary);
+    margin-bottom: 8px;
+  }
+  input {
+    width: 100%;
+    border: 0.5px solid #4b5563; // border-gray-600
+    padding: 16px; // p-2
+    margin-top: 4px; // mt-1
+    outline: none; // focus:outline-none
+    font-size: 12px;
+    &:focus {
+      outline: 0.5px solid var(--color-primary); // outline-blue-500
+    }
+  }
+  p {
+    font-size: 10px;
+    font-weight: var(--font-light);
+    color: #ff3939;
+    margin-top: 4px; // mt-1
+  }
+}
+@media (max-width: 480px) {
+  .Input label {
+    margin-bottom: 0;
+  }
+}

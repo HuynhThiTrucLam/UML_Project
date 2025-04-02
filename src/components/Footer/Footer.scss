@@ -1,0 +1,124 @@
+.Footer {
+  font-family: "Inter", sans-serif;
+  background-color: #01284f;
+  color: white;
+  align-items: center;
+
+  &-container {
+    margin: 0 auto;
+    width: 85%;
+    display: flex;
+    gap: 32px;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 0;
+  }
+  &-logo {
+    width: 400px;
+    height: auto;
+  }
+  &-description {
+    font-size: 12px;
+    font-weight: 300;
+  }
+  &-slogan {
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  &-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 20px 0;
+  }
+  &-left {
+    display: flex;
+    gap: 16px;
+    flex-direction: column;
+  }
+  &-right {
+    display: flex;
+    flex-direction: column;
+    align-items: right;
+  }
+  &-bottom {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+  }
+  &-title {
+    font-size: 14px;
+    font-weight: var(--font-semibold);
+    margin-bottom: 10px;
+  }
+  &-grid {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    font-size: 12px;
+    font-weight: 300;
+    a {
+      color: white;
+      text-decoration: none;
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+  &-infor {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    align-items: center;
+    p {
+      font-weight: var(--font-semibold);
+    }
+    span {
+      font-size: 12px;
+      font-weight: 300;
+    }
+    .title {
+      font-size: 12px;
+      font-weight: var(--font-semibold);
+    }
+  }
+}
+
+@media (max-width: 1024px) {
+  .Footer-bottom {
+    grid-template-columns: repeat(2, 1fr); // Adjust to 2 columns
+  }
+}
+
+@media (max-width: 768px) {
+  .Footer-top {
+    flex-direction: column;
+    text-align: center;
+    display: flex;
+
+    gap: 32px;
+  }
+
+  .Footer-right {
+    align-items: center; // Center align the right section
+    width: 100%;
+  }
+
+  .Footer-bottom {
+    grid-template-columns: 1fr; // Stack all sections in 1 column
+    text-align: center;
+  }
+
+  .Footer-infor {
+    justify-content: center; // Center align icons
+  }
+
+  button {
+    width: 100%;
+    max-width: 250px;
+  }
+}
