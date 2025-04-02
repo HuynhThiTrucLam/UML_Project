@@ -1,18 +1,26 @@
-import { CourseProps } from "../../store/type/CourseType";
+import { useState } from "react";
+import { CourseType } from "../../store/type/Course";
 import "./Course.scss";
 
-const Course = (courseData: CourseProps) => {
+export interface CourseProps {
+  data: CourseType;
+  isSelected?: boolean;
+  onClick: (courseId: string) => void;
+}
+
+const Course = ({ data, isSelected = false, onClick }: CourseProps) => {
   return (
-    <div className="Course">
+    <div
+      className={`Course ${isSelected ? "selected" : ""}`}
+      onClick={() => onClick(data.id)}
+    >
       <div className="Course-container">
-        <p className="Course-heading">{courseData.data.name}</p>
-        <p>Ngày thi dự kiến: {courseData.data.examDate}</p>
-        <p>Thời hạn đăng ký: {courseData.data.registrationDeadline}</p>
+        <p className="Course-heading">{data.name}</p>
+        <p>Ngày thi dự kiến: {data.examDate}</p>
+        <p>Thời hạn đăng ký: {data.registrationDeadline}</p>
         <p>
-          Số lượng đã đăng ký: {courseData.data.registeredCount}/
-          {courseData.data.maxStudents}
+          Số lượng đã đăng ký: {data.registeredCount}/{data.maxStudents}
         </p>
-        {/* Add more classes as needed */}
       </div>
     </div>
   );

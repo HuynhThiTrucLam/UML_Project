@@ -6,8 +6,3 @@ export interface CourseType {
   registeredCount: number; // Số lượng đã đăng ký
   maxStudents: number; // Số lượng học viên tối đa
 }
-
-export interface CourseProps {
-  data: CourseType;
-  onClick: (courseId: string) => void;
-}

@@ -3,13 +3,20 @@ import "./Input.scss";
 
 interface InputProps {
   label: string;
+  value: string;
   placeholder: string;
   isForce?: boolean;
   className?: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const Input: React.FC<InputProps> = ({ label, placeholder, isForce }) => {
-  const [value, setValue] = useState("");
+const Input: React.FC<InputProps> = ({
+  label,
+  placeholder,
+  isForce,
+  value,
+  onChange,
+}) => {
   const [error, setError] = useState(false);
 
   const handleBlur = () => {
@@ -24,7 +31,7 @@ const Input: React.FC<InputProps> = ({ label, placeholder, isForce }) => {
       <input
         type="text"
         value={value}
-        onChange={(e) => setValue(e.target.value)}
+        onChange={onChange}
         onBlur={handleBlur}
         placeholder={placeholder}
         className="border border-gray-600 p-2 focus:outline-blue-500"

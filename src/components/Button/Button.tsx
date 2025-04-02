@@ -15,7 +15,7 @@ const Button: React.FC<ButtonProps> = ({
   return (
     <button
       className={`Button ${
-        isPrimary ? "Button--primary" : "Button--secondary"
+        isPrimary ? "Button--primary" : "Button--secondary "
       }`}
       onClick={onClick}
     >

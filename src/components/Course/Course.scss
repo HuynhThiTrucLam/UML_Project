@@ -19,4 +19,8 @@
   &-heading {
     font-weight: var(--font-semibold) !important;
   }
+  &.selected {
+    border: 2px solid var(--color-primary);
+    background-color: rgba(var(--color-primary-rgb), 0.1);
+  }
 }

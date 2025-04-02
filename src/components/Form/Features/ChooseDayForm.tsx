@@ -1,9 +1,9 @@
 import React, { use, useEffect, useState } from "react";
-import "./Form.scss";
-import Course from "../Course/Course";
-import HealthCheck from "../Course/HealthCheck";
-import { CourseType } from "../../store/type/CourseType";
-import { HealthCheckType } from "../../store/type/HealthCheckType";
+import "../Form.scss";
+import Course from "../../Course/Course";
+import HealthCheck from "../../Course/HealthCheck";
+import { CourseType } from "../../../store/type/Course";
+import { HealthCheckType } from "../../../store/type/HealthCheck";
 const mockData = [
   {
     id: "A1-001",
@@ -68,16 +68,33 @@ const mockHealthCheck = [
   },
 ];
 
-const ChooseDayForm = () => {
+interface ChooseDayFormProps {
+  formData: {
+    courseId: string;
+    healthCheckId: string;
+  };
+  onFormDataChange: (
+    data: Partial<{ courseId: string; healthCheckId: string }>
+  ) => void;
+}
+
+const ChooseDayForm = ({ formData, onFormDataChange }: ChooseDayFormProps) => {
   const [courseData, setCourseData] = useState<CourseType[]>([]);
   const [healthCheckData, setHealthCheckData] = useState<HealthCheckType[]>([]);
+
   useEffect(() => {
     setCourseData(mockData);
     setHealthCheckData(mockHealthCheck);
   }, []);
-  const [selectedCourse, setSelectedCourse] = useState<CourseType | null>(null);
-  const [selectedHealthCheck, setSelectedHealthCheck] =
-    useState<HealthCheckType | null>(null);
+
+  const handleCourseSelect = (courseId: string) => {
+    onFormDataChange({ courseId });
+  };
+
+  const handleHealthCheckSelect = (healthCheckId: string) => {
+    onFormDataChange({ healthCheckId });
+  };
+
   return (
     <div className="Form-choose">
       <div className="Form-choose-course">
@@ -86,12 +103,8 @@ const ChooseDayForm = () => {
           {courseData.map((course, index) => (
             <Course
               data={course}
-              key={index}
-              onClick={(courseId) => {
-                setSelectedCourse(
-                  courseData.find((course) => course.id === courseId) || null
-                );
-              }}
+              isSelected={formData.courseId === course.id}
+              onClick={() => handleCourseSelect(course.id)}
             />
           ))}
         </div>
@@ -99,15 +112,12 @@ const ChooseDayForm = () => {
       <div className="Form-choose-course">
         <p>* Chọn lịch khám sức khoẻ</p>
         <div className="Form-choose-course-list">
-          {healthCheckData.map((course, index) => (
+          {healthCheckData.map((health, index) => (
             <HealthCheck
-              key={index}
-              data={course}
-              onClick={(courseId) => {
-                setSelectedHealthCheck(
-                  healthCheckData.find((course) => course.id === courseId) ||
-                    null
-                );
+              data={health}
+              isSelected={formData.healthCheckId === health.id}
+              onClick={(healthId) => {
+                handleHealthCheckSelect(health.id);
               }}
             />
           ))}

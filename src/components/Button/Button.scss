@@ -7,6 +7,7 @@
   transition: all 0.2s ease-in-out;
 
   &--primary {
+    width: 100%;
     background-color: var(--color-primary);
     color: var(--color-white);
     font-size: 14px;

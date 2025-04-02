@@ -80,6 +80,12 @@
     grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
     justify-content: center;
+    & > :first-child {
+      grid-column: span 2;
+      input {
+        padding: 170px 120px 0 330px;
+      }
+    }
     &-container {
       width: 100%;
       display: flex;
