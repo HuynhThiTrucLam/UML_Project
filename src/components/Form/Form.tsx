@@ -145,23 +145,22 @@ const Form = () => {
 
         <div className="Form-wrap">
           {/* Form Content */}
-          <form className="Form-input">
-            {activeTab === 0 && (
-              <PersonalInforForm
-                formData={personalData}
-                onFormDataChange={handlePersonalDataChange}
-              />
-            )}
-            {activeTab === 1 && (
-              <UploadForm onFormDataChange={handlePersonalImgDataChange} />
-            )}
-            {activeTab === 2 && (
-              <ChooseDayForm
-                formData={chooseData}
-                onFormDataChange={handleChooseDataChange}
-              />
-            )}
-          </form>
+          <form className="Form-input"></form>
+          {activeTab === 0 && (
+            <PersonalInforForm
+              formData={personalData}
+              onFormDataChange={handlePersonalDataChange}
+            />
+          )}
+          {activeTab === 1 && (
+            <UploadForm onFormDataChange={handlePersonalImgDataChange} />
+          )}
+          {activeTab === 2 && (
+            <ChooseDayForm
+              formData={chooseData}
+              onFormDataChange={handleChooseDataChange}
+            />
+          )}
           {/* Button điều hướng */}
           <div className="Form-actions">
             {activeTab > 0 && (

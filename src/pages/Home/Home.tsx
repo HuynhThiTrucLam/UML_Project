@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import Button from "../../components/Button/Button";
 import LogoBlue from "../../assets/images/Logo-blue.png";
 import Background from "../../assets/images/background.png";
@@ -21,6 +22,13 @@ import {
 import Form from "../../components/Form/Form";
 
 const Home = () => {
+  const navigate = useNavigate();
+  const formRef = useRef<HTMLDivElement>(null);
+
+  const scrollToForm = () => {
+    formRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
   return (
     <div className="Home">
       <div className="Home-top">
@@ -32,7 +40,11 @@ const Home = () => {
               tin cầm lái an toàn
             </p>
             <p className="p">Vững tay lái – Chắc tương lai!</p>
-            <Button text="ĐĂNG KÝ THI NGAY" isPrimary={true} />
+            <Button
+              text="ĐĂNG KÝ THI NGAY"
+              isPrimary={true}
+              onClick={scrollToForm}
+            />
           </div>
           <img className="Home-image" alt="Image" src={Background} />
         </div>
@@ -45,6 +57,7 @@ const Home = () => {
             icon={<FaRegCalendarAlt size={24} />}
             className="card"
             img="https://plus.unsplash.com/premium_photo-1741194732682-21f3046cf1a6?q=80&w=2433&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+            onClick={() => navigate("/calendar")}
           />
           <Card
             desc="Xem tình trạng hồ sơ"
@@ -52,24 +65,28 @@ const Home = () => {
             icon={<FaRegFileAlt size={24} />}
             className="card"
             img="https://images.unsplash.com/photo-1593642633279-3a2f8b1f6c7e?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60"
+            onClick={() => navigate("/profile")}
           />
-          <Card
+          {/* <Card
             desc="Xem các Khoá học Lịch thi, Lịch học"
             feature="Tra cứu kết quả thi"
             icon={<FaRegClipboard size={24} />}
             className="card"
-          />
+            onClick={() => navigate("/calendar")}
+          /> */}
           <Card
             desc="Xem các Khoá học Lịch thi, Lịch học"
             feature="Thanh toán học phí"
             icon={<FaRegCreditCard size={24} />}
             className="card"
+            onClick={() => navigate("/fee")}
           />
           <Card
             desc="Xem các Khoá học Lịch thi, Lịch học"
             feature="Nộp đơn khiếu nại"
             icon={<FaExclamationCircle size={24} />}
             className="card"
+            onClick={() => navigate("/complaint")}
           />
         </div>
       </div>
@@ -160,7 +177,9 @@ const Home = () => {
           </div>
         </div>
       </div>
-      <Form></Form>
+      <div ref={formRef}>
+        <Form />
+      </div>
     </div>
   );
 };

@@ -40,6 +40,10 @@ const UploadForm: React.FC<UploadFormProps> = ({ onFormDataChange }) => {
             onChange={(e) => onFormDataChange({ cardImgFront: e.target.value })}
           />
         </div>
+        <div className="Form-upload-format">
+          <span>Hỗ trợ các tệp PDF, JPEG, PNG</span>
+          <span>Kích thước tối đa: 20MB</span>
+        </div>
       </div>
       <div className="Form-upload-container">
         <p>* Tải lên hình ảnh mặt sau CCCD</p>
@@ -53,6 +57,10 @@ const UploadForm: React.FC<UploadFormProps> = ({ onFormDataChange }) => {
             type="file"
             onChange={(e) => onFormDataChange({ cardImgBack: e.target.value })}
           />
+        </div>
+        <div className="Form-upload-format">
+          <span>Hỗ trợ các tệp PDF, JPEG, PNG</span>
+          <span>Kích thước tối đa: 20MB</span>
         </div>
       </div>
     </div>

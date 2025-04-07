@@ -2,8 +2,8 @@ import { useState } from "react";
 import "./Input.scss";
 
 interface InputProps {
-  label: string;
-  value: string;
+  label?: string;
+  value?: string;
   placeholder: string;
   isForce?: boolean;
   className?: string;
@@ -20,14 +20,16 @@ const Input: React.FC<InputProps> = ({
   const [error, setError] = useState(false);
 
   const handleBlur = () => {
-    setError(value.trim() === "");
+    setError(value?.trim() === "");
   };
 
   return (
-    <div className="Input flex flex-col w-full max-w-md">
-      <label className="Input-label font-semibold">
-        {isForce ? `* ${label}` : label}
-      </label>
+    <div className="Input flex flex-col w-full">
+      {label ? (
+        <label className="Input-label font-semibold">
+          {isForce ? `* ${label}` : label}
+        </label>
+      ) : null}
       <input
         type="text"
         value={value}

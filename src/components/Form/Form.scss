@@ -134,6 +134,16 @@
         }
       }
     }
+    &-format {
+      width: 100%;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      span {
+        font-size: 12px;
+        font-weight: var(--font-light);
+      }
+    }
     p {
       font-size: 12px;
       font-weight: var(--font-semibold);

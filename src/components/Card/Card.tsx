@@ -10,9 +10,16 @@ interface CardProps {
   className?: string;
   mouseEnter?: () => void;
   mouseLeave?: () => void;
+  onClick?: () => void;
 }
 
-export const Card: React.FC<CardProps> = ({ desc, feature, icon, img }) => {
+export const Card: React.FC<CardProps> = ({
+  desc,
+  feature,
+  icon,
+  img,
+  onClick,
+}) => {
   const [isHovered, setIsHovered] = useReducer(
     (state: boolean) => !state,
     false
@@ -23,6 +30,7 @@ export const Card: React.FC<CardProps> = ({ desc, feature, icon, img }) => {
       className="Card"
       onMouseEnter={setIsHovered}
       onMouseLeave={setIsHovered}
+      onClick={onClick}
     >
       <div className="Card-container">
         <div className="Card-icon">{icon}</div>

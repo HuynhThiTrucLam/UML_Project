@@ -60,7 +60,7 @@ const PersonalInforForm: React.FC<PersonalInforFormProps> = ({
             </SelectTrigger>
             <SelectContent className="Form-select-container">
               <SelectGroup>
-                <SelectLabel>Chọn hạng bằng lái</SelectLabel>
+                <SelectLabel>Lọc theo hạng bằng lái</SelectLabel>
                 {mocktypeOfLicense.map((item) => (
                   <SelectItem
                     key={item.id}
