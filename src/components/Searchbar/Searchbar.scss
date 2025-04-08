@@ -1,0 +1,22 @@
+.Searchbar {
+  position: relative;
+  input {
+    width: 100%;
+    font-size: 12px;
+    color: var(--color-primary);
+    font-weight: var(--font-light);
+    &:active {
+      border: none;
+    }
+  }
+  &-button {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--color-primary);
+  }
+}

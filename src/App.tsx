@@ -2,6 +2,8 @@ import { Routes, Route } from "react-router-dom";
 import UserLayout from "./layouts/UserLayout";
 import Notfound from "./pages/NotFound/Notfound";
 import "./App.css";
+import Login from "./pages/Login/Login";
+import AdminLayout from "./layouts/AdminLayout";
 
 function App() {
   return (
@@ -9,10 +11,13 @@ function App() {
       {/* User Routes */}
       <Route path="/*" element={<UserLayout />} />
 
-      {/* Admin Routes */}
-      {/* <Route path="/admin/*" element={<AdminLayout />} /> */}
+      {/*Login Page*/}
+      <Route path="/login" element={<Login />} />
 
-      {/* 404 Page */}
+      {/* Register Page */}
+      {/* Admin Routes */}
+      <Route path="/admin/*" element={<AdminLayout />} />
+
       <Route path="*" element={<Notfound />} />
     </Routes>
   );

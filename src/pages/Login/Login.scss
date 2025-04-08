@@ -1,0 +1,110 @@
+.Login {
+  button {
+    padding: 10px;
+  }
+  &-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  &-image {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-color: var(--color-primary);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    img {
+      width: 60%;
+    }
+    p {
+      font-size: 16px;
+      color: var(--color-white);
+      font-weight: var(--font-semibold);
+    }
+    span {
+      width: 100%;
+      font-size: 14px;
+      color: var(--color-white);
+      font-weight: var(--font-light);
+    }
+  }
+  &-overlay {
+    position: absolute;
+    transform: translate(30%, 30%);
+    top: 0;
+    left: 0;
+    height: 60%;
+    width: 60%;
+    background-color: var(--color-blue);
+    opacity: 0.2;
+    z-index: 0;
+    border-radius: 10px;
+    filter: blur(100px);
+    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  }
+  &-form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    align-items: left;
+    text-align: left;
+    padding: 6rem;
+    img {
+      width: 40%;
+    }
+    h1 {
+      font-size: 2rem;
+      color: var(--color-primary);
+      font-weight: var(--font-semibold);
+    }
+  }
+  &-line {
+    position: relative;
+    text-align: center;
+    span {
+      z-index: 1;
+      position: relative;
+      display: inline-block;
+      background-color: #fff;
+      padding-inline: 1rem;
+      font-size: 12px;
+      color: grey;
+    }
+
+    &::after {
+      content: "";
+      display: block;
+      position: absolute;
+      top: 50%;
+      left: 0;
+      transform: translateY(-50%);
+      width: 100%;
+      height: 1px;
+      background-color: grey;
+      opacity: 0.5;
+    }
+  }
+  &-another {
+    cursor: pointer;
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    border: 0.5px solid var(--color-border);
+    span {
+      font-size: 12px;
+      color: var(--color-primary);
+      font-weight: var(--font-regular);
+    }
+    img {
+      width: 16px;
+      height: 16px;
+    }
+  }
+}

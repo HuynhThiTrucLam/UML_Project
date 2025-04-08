@@ -1,0 +1,72 @@
+.Sidebar {
+  background-color: #fff;
+  padding-top: 1rem;
+  width: 100%;
+  color: var(--color-primary);
+  height: 100%;
+  padding: 1.5rem 1rem 1rem 3rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  &-container {
+    height: 90%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  &-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    padding: 1rem 1rem 1rem 0;
+
+    text-decoration: none;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: white;
+    }
+
+    &.active {
+      color: var(--color-primary);
+      // border-left: 4px solid white;
+      font-size: 12px;
+      font-weight: var(--font-semibold);
+      .Sidebar-label {
+        color: var(--color-primary);
+        font-weight: var(--font-semibold);
+      }
+    }
+  }
+
+  &-icon {
+    margin-right: 1rem;
+  }
+
+  &-label {
+    font-size: 12px;
+    font-weight: var(--font-light);
+  }
+  &-header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    p {
+      font-size: 10px;
+      font-weight: var(--font-light);
+      color: var(--color-primary);
+    }
+  }
+  &-below {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: auto;
+    button {
+      font-size: 12px;
+    }
+  }
+}

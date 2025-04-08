@@ -1,5 +1,5 @@
 import { useState } from "react";
-import ComplaintIcon from "../../assets/icons/Complaint";
+import ComplaintIcon from "../../assets/icons/ComplaintIcon";
 import {
   Select,
   SelectContent,
