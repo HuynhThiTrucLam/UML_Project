@@ -1,24 +1,19 @@
 import React, { useState } from "react";
 import Input from "../../Input/Input";
 
+import { LicenseType } from "../../../store/type/Lincense";
 import { PersonalData } from "../../../store/type/Student";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "../../ui/select";
+import Selection from "../../Select/Select";
 
-export const mocktypeOfLicense = [
+export const typeOfLicense: LicenseType[] = [
+  { id: "0", name: "Tất cả" },
   { id: "1", name: "Bằng lái A1" },
   { id: "2", name: "Bằng lái A2" },
   { id: "3", name: "Bằng lái B1" },
   { id: "4", name: "Bằng lái B2" },
   { id: "5", name: "Bằng lái C" },
 ];
+
 export const mockGender = [
   { id: "1", name: "Nam" },
   { id: "2", name: "Nữ" },
@@ -38,9 +33,7 @@ const PersonalInforForm: React.FC<PersonalInforFormProps> = ({
     onFormDataChange({ [field]: value });
   };
   const [gender, setGender] = useState<string>(mockGender[0].name);
-  const [licenseType, setLicenseType] = useState<string>(
-    mocktypeOfLicense[0].name
-  );
+  const [licenseType, setLicenseType] = useState<string>(typeOfLicense[0].name);
 
   return (
     <>
@@ -54,55 +47,21 @@ const PersonalInforForm: React.FC<PersonalInforFormProps> = ({
         />
         <div className="Form-select">
           <p>* Hạng bằng lái muốn thi</p>
-          <Select>
-            <SelectTrigger className="Form-select-container">
-              <SelectValue placeholder={licenseType} />
-            </SelectTrigger>
-            <SelectContent className="Form-select-container">
-              <SelectGroup>
-                <SelectLabel>Lọc theo hạng bằng lái</SelectLabel>
-                {mocktypeOfLicense.map((item) => (
-                  <SelectItem
-                    key={item.id}
-                    value={item.name}
-                    onClick={() => {
-                      handleChange("licenseType", item.id);
-                      setLicenseType(item.name);
-                    }}
-                    className="text-[12px]"
-                  >
-                    {item.name}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
+          <Selection
+            placeholder={licenseType}
+            data={typeOfLicense}
+            setData={() => {
+              setLicenseType;
+            }}
+          ></Selection>
         </div>
         <div className="Form-select">
           <p>* Giới tính</p>
-          <Select>
-            <SelectTrigger className="Form-select-container">
-              <SelectValue placeholder={gender} />
-            </SelectTrigger>
-            <SelectContent className="Form-select-container">
-              <SelectGroup>
-                <SelectLabel>Giới tính</SelectLabel>
-                {mockGender.map((item) => (
-                  <SelectItem
-                    key={item.id}
-                    value={item.name}
-                    onClick={() => {
-                      handleChange("gender", item.id);
-                      setGender(item.name);
-                    }}
-                    className="text-[12px]"
-                  >
-                    {item.name}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
+          <Selection
+            placeholder={gender}
+            data={mockGender}
+            setData={setGender}
+          ></Selection>
         </div>
         <Input
           label="Năm sinh"

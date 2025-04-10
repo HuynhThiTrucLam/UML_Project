@@ -3,6 +3,7 @@ import HeaderAdmin from "../components/Header/HeaderAdmin";
 import AdminDashboard from "../pages/AdminDashboard/AdminDashboard";
 import { AdminSidebar } from "../components/Sidebar/AdminSidebar";
 import "./AdminLayout.scss";
+import ManageCourse from "../pages/ManageCourse/ManageCourse";
 
 const AdminLayout = () => {
   return (
@@ -13,6 +14,7 @@ const AdminLayout = () => {
         <div className="admin-main">
           <Routes>
             <Route path="dashboard" element={<AdminDashboard />} />
+            <Route path="manage-course" element={<ManageCourse />} />
             {/* Other routes as needed */}
           </Routes>
         </div>

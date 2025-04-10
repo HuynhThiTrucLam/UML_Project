@@ -1,15 +1,15 @@
 // ClassScheduleCalendar.tsx
 import React, { useState, useEffect } from "react";
-import { ScheduleItem } from "../../../store/type/ScheduleItem";
 import "./Schedule.scss";
+import { ScheduleType } from "../../../store/type/ScheduleItem";
 
 interface ClassScheduleCalendarProps {
-  scheduleData: ScheduleItem[];
+  scheduleData: ScheduleType[];
   selectedDate?: Date;
   isCourse: boolean;
 }
 
-const Schedule: React.FC<ClassScheduleCalendarProps> = ({
+const ScheduleItem: React.FC<ClassScheduleCalendarProps> = ({
   scheduleData,
   selectedDate = new Date(),
   isCourse,
@@ -52,7 +52,7 @@ const Schedule: React.FC<ClassScheduleCalendarProps> = ({
   const getClassForDateAndHour = (
     date: Date,
     hour: number
-  ): ScheduleItem | undefined => {
+  ): ScheduleType | undefined => {
     // console.info("scheduleData: ", scheduleData);
     const result = scheduleData.find((item) => {
       const classDate = new Date(item.date);
@@ -140,20 +140,22 @@ const Schedule: React.FC<ClassScheduleCalendarProps> = ({
                   {classItem && (
                     <div
                       className={`class-item ${getColorClass(
-                        classItem.licenseTypeId
+                        classItem.courseId
                       )}`}
                     >
-                      <div className="class-code">{classItem.classCode}</div>
+                      <div className="class-code">{classItem.courseId}</div>
                       <div className="class-room">
-                        Địa điểm: {classItem.classroom}
+                        Địa điểm: {classItem.location}
                       </div>
                       <div className="class-time">
-                        Thời gian: {classItem.startTime}
+                        Thời gian: {classItem.startTime} - {classItem.endTime}
                       </div>
                       <div className="student-count">
-                        Hạng bằng lái: {classItem.licenseTypeId}
+                        Hạng bằng lái: {classItem.typeOfLicense}
                       </div>
-
+                      <div className="student-count">
+                        Hình thức: {classItem.type}
+                      </div>
                       {isCourse && (
                         <div className="teacher-info">
                           <div className="teacher-avatar">
@@ -189,4 +191,4 @@ const Schedule: React.FC<ClassScheduleCalendarProps> = ({
   );
 };
 
-export default Schedule;
+export default ScheduleItem;

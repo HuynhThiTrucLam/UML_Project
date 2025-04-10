@@ -1,0 +1,12 @@
+.Selection {
+  width: 100%;
+  button {
+    width: 100%;
+    border: 0.5px solid var(--color-primary);
+    border-radius: 0;
+    padding: 1.5rem 1rem;
+    box-shadow: none;
+    font-size: 12px;
+    color: var(--color-primary);
+  }
+}

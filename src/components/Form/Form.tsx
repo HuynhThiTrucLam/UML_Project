@@ -4,7 +4,7 @@ import Button from "../Button/Button";
 import ChooseDayForm from "./Features/ChooseDayForm";
 import PersonalInforForm, {
   mockGender,
-  mocktypeOfLicense,
+  typeOfLicense,
 } from "./Features/PersonalInforForm";
 import UploadForm from "./Features/UploadForm";
 import "./Form.scss";
@@ -28,7 +28,7 @@ const Form = () => {
     phone: "",
     gender: mockGender[0].id,
     birthDate: "",
-    licenseType: mocktypeOfLicense[0].id,
+    licenseType: typeOfLicense[0].id,
     email: "",
   });
   const [personalImgData, setPersonalImgData] = useState({

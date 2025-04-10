@@ -1,17 +1,9 @@
 import { useState } from "react";
 import ComplaintIcon from "../../assets/icons/ComplaintIcon";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "../../components/ui/select";
-import "./Complaint.scss";
-import { Textarea } from "../../components/ui/textarea";
 import Button from "../../components/Button/Button";
+import Selection from "../../components/Select/Select";
+import { Textarea } from "../../components/ui/textarea";
+import "./Complaint.scss";
 
 const typeOfComplaintList = [
   { id: 1, name: "Khiếu nại về kết quả thi" },
@@ -41,7 +33,12 @@ const Complaint = () => {
         </div>
         <div className="Form-select">
           <p>* Chọn Nội dung muốn khiếu nại</p>
-          <Select>
+          <Selection
+            placeholder="Nội dung khiếu nại"
+            data={typeOfComplaintList}
+            setData={setTypeOfComplaint}
+          ></Selection>
+          {/* <Select>
             <SelectTrigger className="Form-select-container">
               <SelectValue placeholder="Nội dung khiếu nại" />
             </SelectTrigger>
@@ -59,7 +56,7 @@ const Complaint = () => {
                 ))}
               </SelectGroup>
             </SelectContent>
-          </Select>
+          </Select> */}
           <div className="Complaint-content">
             <p>* Lý do khiếu nại</p>
             <Textarea

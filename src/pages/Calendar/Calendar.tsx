@@ -1,78 +1,81 @@
 import { useEffect, useRef, useState } from "react";
 import { default as CalendarIcon } from "../../assets/icons/Calendar";
 import Button from "../../components/Button/Button";
-import "./Calendar.scss";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "../../components/ui/select";
-import { mocktypeOfLicense } from "../../components/Form/Features/PersonalInforForm";
-import Test from "./Tab/Test";
-import Learn from "./Tab/Learn";
-import { useNavigate } from "react-router-dom";
+import { typeOfLicense } from "../../components/Form/Features/PersonalInforForm";
 import Form from "../../components/Form/Form";
+import Selection from "../../components/Select/Select";
+import { ScheduleType } from "../../store/type/ScheduleItem";
+import "./Calendar.scss";
 import AbsentForm from "./Tab/AbsentForm";
-import { ScheduleItem } from "../../store/type/ScheduleItem";
+import Learn from "./Tab/Learn";
+import Test from "./Tab/Test";
 
-export const scheduleItems: ScheduleItem[] = [
+export const scheduleItems: ScheduleType[] = [
   {
-    classCode: "#ABCD",
-    classroom: "A01",
-    date: "2025-03-31", // Monday
-    startTime: "9:00 AM",
-    studentCount: 30,
+    id: "1",
+    courseId: "1",
+    typeOfLicense: "B1",
+    type: "LyThuyet",
+    date: "2025-04-09",
+    startTime: "08:00",
+    endTime: "10:00",
+    location: "Hà Nội",
     teacher: "Nguyễn Văn A",
-    licenseTypeId: "1",
   },
   {
-    classCode: "#ABCD",
-    classroom: "A01",
-    date: "2025-04-01", // Tuesday
-    startTime: "11:00 AM",
-    studentCount: 30,
+    id: "2",
+    courseId: "1",
+    typeOfLicense: "B1",
+    type: "ThucHanh",
+    date: "2025-04-10",
+    startTime: "08:00",
+    endTime: "10:00",
+    location: "Hà Nội",
     teacher: "Nguyễn Văn A",
-    licenseTypeId: "2",
   },
   {
-    classCode: "#ABCD",
-    classroom: "A01",
-    date: "2025-04-02", // Wednesday
-    startTime: "13:00 PM",
-    studentCount: 30,
+    id: "3",
+    courseId: "1",
+    typeOfLicense: "B1",
+    type: "Thi",
+    date: "2025-04-08",
+    startTime: "08:00",
+    endTime: "10:00",
+    location: "Hà Nội",
     teacher: "Nguyễn Văn A",
-    licenseTypeId: "3",
   },
   {
-    classCode: "#ABCD",
-    classroom: "A01",
-    date: "2025-04-03", // Thursday
-    startTime: "9:00 AM",
-    studentCount: 30,
-    teacher: "Nguyễn Văn A",
-    licenseTypeId: "4",
+    id: "4",
+    courseId: "2",
+    typeOfLicense: "B2",
+    type: "LyThuyet",
+    date: "2025-04-11",
+    startTime: "08:00",
+    endTime: "10:00",
+    location: "Hà Nội",
+    teacher: "Nguyễn Văn B",
   },
   {
-    classCode: "#ABCD",
-    classroom: "A01",
-    date: "2025-04-04", // Friday
-    startTime: "12:00 PM",
-    studentCount: 30,
-    teacher: "Nguyễn Văn A",
-    licenseTypeId: "5",
+    id: "5",
+    courseId: "2",
+    typeOfLicense: "B2",
+    type: "ThucHanh",
+    date: "2025-04-12",
+    startTime: "12:00",
+    endTime: "16:00",
+    location: "Hà Nội",
+    teacher: "Nguyễn Văn B",
   },
   {
-    classCode: "#ABCD",
-    classroom: "A01",
-    date: "2025-04-06", // Saturday
-    startTime: "9:00 AM",
-    studentCount: 30,
-    teacher: "Nguyễn Văn A",
-    licenseTypeId: "1",
+    id: "6",
+    courseId: "2",
+    typeOfLicense: "B2",
+    type: "Thi",
+    date: "2025-04-13",
+    startTime: "08:00",
+    endTime: "10:00",
+    location: "Hà Nội",
+    teacher: "Nguyễn Văn B",
   },
 ];
 
@@ -83,23 +86,15 @@ const tabs = [
 ];
 
 const Calendar = () => {
-  const [scheduleData, setScheduleData] = useState<ScheduleItem[]>([]);
+  const [scheduleData, setScheduleData] = useState<ScheduleType[]>([]);
 
   const [activeTab, setActiveTab] = useState<number>(0);
-  const [licenseType, setLicenseType] = useState<string>(
-    mocktypeOfLicense[0].name
-  );
+  const [licenseType, setLicenseType] = useState<string>(typeOfLicense[0].name);
 
-  const navigate = useNavigate();
   const formRef = useRef<HTMLDivElement>(null);
 
   const scrollToForm = () => {
     formRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  const handleFillter = (id: string) => {
-    //goi api lay danh sach lich hoc theo id
-    console.log("Laasy lich hoc theo hang bang", id);
   };
 
   useEffect(() => {
@@ -144,33 +139,17 @@ const Calendar = () => {
             ))}
           </div>
           <div className="Calendar-filter">
-            <Select>
-              <SelectTrigger className="Calendar-filter-container">
-                <SelectValue placeholder={licenseType} />
-              </SelectTrigger>
-              <SelectContent className="Calendar-filter-container">
-                <SelectGroup>
-                  <SelectLabel>Chọn hạng bằng lái</SelectLabel>
-                  {mocktypeOfLicense.map((item) => (
-                    <SelectItem
-                      key={item.id}
-                      value={item.name}
-                      onClick={() => {
-                        handleFillter(item.id);
-                        setLicenseType(item.name);
-                      }}
-                      className="text-[12px]"
-                    >
-                      {item.name}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
+            <Selection
+              placeholder={licenseType}
+              data={typeOfLicense}
+              setData={() => {
+                setLicenseType;
+              }}
+            ></Selection>
           </div>
         </div>
         <div className="Calendar-content">
-          {activeTab === 0 && <Learn schedulData={scheduleData}></Learn>}
+          {activeTab === 0 && <Learn scheduleData={scheduleData}></Learn>}
           {activeTab === 1 && <Test schedulData={scheduleData}></Test>}
           {activeTab === 2 && <AbsentForm></AbsentForm>}
         </div>

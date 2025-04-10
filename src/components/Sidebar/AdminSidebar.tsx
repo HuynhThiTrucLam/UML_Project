@@ -24,7 +24,7 @@ export const AdminSidebar = () => {
       label: "Quản lý hồ sơ",
     },
     {
-      path: "/admin/classes",
+      path: "/admin/manage-course",
       icon: <Course />,
       label: "Quản lý lớp học",
     },
@@ -33,11 +33,11 @@ export const AdminSidebar = () => {
       icon: <License />,
       label: "Quản lý giấy phép",
     },
-    {
-      path: "/admin/employees",
-      icon: <Employee />,
-      label: "Quản lý nhân viên",
-    },
+    // {
+    //   path: "/admin/employees",
+    //   icon: <Employee />,
+    //   label: "Quản lý nhân viên",
+    // },
     {
       path: "/admin/complaints",
       icon: <Complaint />,

@@ -1,18 +1,10 @@
 import { useEffect, useState } from "react";
 import FileIcon from "../../../assets/icons/File";
 import Input from "../../../components/Input/Input";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "../../../components/ui/select";
 
-import { Textarea } from "../../../components/ui/textarea";
 import Button from "../../../components/Button/Button";
+import Selection from "../../../components/Select/Select";
+import { Textarea } from "../../../components/ui/textarea";
 import { AbsentFormType } from "../../../store/type/DelayForm";
 
 const typeOfAbsentData = [
@@ -98,7 +90,12 @@ const AbsentForm = () => {
 
             <div className="Calendar-select">
               <p>* Loại đơn</p>
-              <Select>
+              <Selection
+                placeholder={typeOfAbsent}
+                data={typeOfAbsentList}
+                setData={setTypeOfAbsent}
+              ></Selection>
+              {/* <Select>
                 <SelectTrigger className="Calendar-select-container">
                   <SelectValue placeholder={typeOfAbsent} />
                 </SelectTrigger>
@@ -119,7 +116,7 @@ const AbsentForm = () => {
                     ))}
                   </SelectGroup>
                 </SelectContent>
-              </Select>
+              </Select> */}
             </div>
 
             <Input

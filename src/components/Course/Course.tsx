@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { CourseType } from "../../store/type/Course";
 import "./Course.scss";
 
@@ -17,7 +16,9 @@ const Course = ({ data, isSelected = false, onClick }: CourseProps) => {
       <div className="Course-container">
         <p className="Course-heading">{data.name}</p>
         <p>Ngày thi dự kiến: {data.examDate}</p>
-        <p>Thời hạn đăng ký: {data.registrationDeadline}</p>
+        <p>
+          Thời hạn đăng ký: {data.startDate} - {data.endDate}
+        </p>
         <p>
           Số lượng đã đăng ký: {data.registeredCount}/{data.maxStudents}
         </p>

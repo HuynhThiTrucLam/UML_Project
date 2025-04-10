@@ -72,6 +72,9 @@
       gap: 2rem;
       justify-content: center;
       padding: 1rem 2rem;
+      &.admin-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
       p {
         width: max-content;
         color: var(--color-primary);
@@ -80,8 +83,7 @@
         }
       }
     }
-    &-status {
-    }
+
     &-item {
       display: flex;
       flex-direction: column;
