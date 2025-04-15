@@ -1,0 +1,42 @@
+.ManageExam {
+  padding: 32px;
+  box-shadow: 1px 1px 2px 2px rgba(0, 0, 0, 0.1);
+  border-radius: 24px;
+  &-container {
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+  h1 {
+    font-size: 2.5rem;
+    font-weight: var(--font-bold);
+    color: var(--color-primary);
+  }
+
+  &-header {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+  &-filter {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    &-item {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      p {
+        font-size: 12px;
+        font-weight: var(--font-semibold);
+        color: var(--color-primary);
+      }
+    }
+    .Button {
+      width: 20%;
+    }
+  }
+}

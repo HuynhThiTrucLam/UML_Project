@@ -1,7 +1,7 @@
 import { Card, CardContent } from "../../../components/ui/card";
 import { TabsContent } from "../../../components/ui/tabs";
-import CourseDialog from "../Components/AddNewCourse";
-import CourseTable from "../Components/CourseTable";
+import ClassDialog from "../Components/ClassDialog";
+import ClassTable from "../Components/ClassTable";
 const ClassListTab = () => {
   return (
     <div className="ManageCourse">
@@ -16,11 +16,10 @@ const ClassListTab = () => {
                   <h1 className="ManageCourse-class-title">
                     Danh sách các lớp học hiện có
                   </h1>
-                  <CourseDialog mode="add"></CourseDialog>
+                  <ClassDialog mode="add"></ClassDialog>
                 </div>
-
-                <CourseTable></CourseTable>
               </div>
+              <ClassTable></ClassTable>
             </CardContent>
           </Card>
         </TabsContent>

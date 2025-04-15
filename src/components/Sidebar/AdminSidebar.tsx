@@ -1,14 +1,15 @@
 import { NavLink } from "react-router-dom";
-import "./AdminSidebar.scss";
-import Profile from "../../assets/icons/Profile";
+import ActiveArrow from "../../assets/icons/ActiveArrow";
+import Complaint from "../../assets/icons/Complaint";
 import Course from "../../assets/icons/Course";
+import License from "../../assets/icons/License";
+import Profile from "../../assets/icons/Profile";
 import Logo from "../../assets/images/Logo-blue.png";
 import TeamIcon from "../../assets/images/team.png";
 import Button from "../Button/Button";
-import ActiveArrow from "../../assets/icons/ActiveArrow";
-import License from "../../assets/icons/License";
+import "./AdminSidebar.scss";
 import Employee from "../../assets/icons/Employee";
-import Complaint from "../../assets/icons/Complaint";
+import ExamIcon from "../../assets/icons/Employee";
 
 interface SidebarItem {
   path: string;
@@ -29,15 +30,16 @@ export const AdminSidebar = () => {
       label: "Quản lý lớp học",
     },
     {
-      path: "/admin/licenses",
+      path: "/admin/manage-exam",
+      icon: <ExamIcon />,
+      label: "Quản lý kết quả thi",
+    },
+    {
+      path: "/admin/manage-licenses",
       icon: <License />,
       label: "Quản lý giấy phép",
     },
-    // {
-    //   path: "/admin/employees",
-    //   icon: <Employee />,
-    //   label: "Quản lý nhân viên",
-    // },
+
     {
       path: "/admin/complaints",
       icon: <Complaint />,

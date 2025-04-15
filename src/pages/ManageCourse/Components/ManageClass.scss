@@ -1,0 +1,36 @@
+.ManageClass {
+  &-form {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-bottom: 1rem;
+    // Make single items take full width
+    > *:last-child {
+      grid-column: 1 / -1; // Span all columns
+    }
+  }
+  &-time {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  &-title {
+    font-size: 24px;
+    font-weight: var(--font-semibold);
+    color: var(--color-primary);
+    margin-bottom: 1rem;
+  }
+  &-select {
+    display: flex;
+    flex-direction: column;
+    gap: 13px;
+    margin-bottom: 1rem;
+    p {
+      font-size: 12px;
+      color: var(--color-primary);
+      font-weight: var(--font-semibold);
+    }
+  }
+}

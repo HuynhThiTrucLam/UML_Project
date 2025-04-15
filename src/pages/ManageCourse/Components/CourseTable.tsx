@@ -1,10 +1,10 @@
-import { Card, CardContent } from "../../../components/ui/card";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import FilterArrow from "../../../assets/icons/FilterArrow";
 import Button from "../../../components/Button/Button";
 import { typeOfLicense } from "../../../components/Form/Features/PersonalInforForm";
 import SearchBar from "../../../components/Searchbar/SearchBar";
 import Selection from "../../../components/Select/Select";
+import { Card, CardContent } from "../../../components/ui/card";
 import {
   Table,
   TableBody,
@@ -16,7 +16,7 @@ import {
 } from "../../../components/ui/table";
 import { CourseType } from "../../../store/type/Course";
 import { LicenseType } from "../../../store/type/Lincense";
-import AddNewCourse from "./AddNewCourse";
+import CourseDialog from "./CourseDialog";
 
 // Mock data
 export const mockCourses: CourseType[] = [
@@ -92,6 +92,10 @@ const CourseTable = () => {
     setCourses((prev) => prev.filter((course) => course.id !== courseId));
   };
 
+  const handleSearch = (searchString: string) => {
+    console.log("Search course", searchString);
+  };
+
   const handleFilterCoursesByType = (typeId: string) => {
     if (typeId === "0") {
       //Call API to get all courses
@@ -121,7 +125,9 @@ const CourseTable = () => {
               <SearchBar
                 placeholder="Tìm kiếm khoá học"
                 onChange={setSearchString}
-                onSearch={() => {}}
+                onSearch={() => {
+                  handleSearch(searchString);
+                }}
               />
             </div>
             <div className="ManageCourse-type w-60">
@@ -141,7 +147,7 @@ const CourseTable = () => {
               Bảng thông tin khoá học
             </TableCaption>
             <TableHeader>
-              <TableRow className="border border-gray-200">
+              <TableRow className="bg-blue-50 border border-gray-200">
                 <TableHead className="text-center border">
                   Mã khoá học
                 </TableHead>
@@ -186,13 +192,13 @@ const CourseTable = () => {
                   <TableCell className="text-center border">
                     {course.examDate}
                   </TableCell>
-                  <TableCell className="text-center border">
+                  <TableCell className="flex justify-center gap-2 text-center border">
                     <Button
                       text="Xoá"
                       isPrimary={false}
                       onClick={() => handleDeleteCourse(course.id)}
                     />
-                    <AddNewCourse mode="edit" initialData={course} />
+                    <CourseDialog mode="edit" initialData={course} />
                   </TableCell>
                 </TableRow>
               ))}

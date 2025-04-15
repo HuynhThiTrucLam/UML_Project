@@ -102,7 +102,9 @@ const ProfileTable = ({ profileData, isAdmin }: ProfileTableProps) => {
                 <div className="flex gap-[8px]">
                   <p className="title">Loại bằng lái: </p>
                   <p>
-                    {profileData.studentInfor.chooseData.course.typeOfLicense}
+                    {String(
+                      profileData.studentInfor.chooseData.course.typeOfLicense
+                    )}
                   </p>
                 </div>
 

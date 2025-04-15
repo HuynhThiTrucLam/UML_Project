@@ -1,6 +1,6 @@
 import { Card, CardContent } from "../../../components/ui/card";
 import { TabsContent } from "../../../components/ui/tabs";
-import CourseDialog from "../Components/AddNewCourse";
+import CourseDialog from "../Components/CourseDialog";
 import CourseTable from "../Components/CourseTable";
 
 const CourseListTab = () => {

@@ -1,7 +1,13 @@
-import { Tabs, TabsList, TabsTrigger } from "../../components/ui/tabs";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "../../components/ui/tabs";
 import "./ManageCourse.scss";
 import ClassListTab from "./Tabs/ClassListTab";
 import CourseListTab from "./Tabs/CourseListTab";
+import ListStudent from "./Tabs/ListStudentTab";
 import ScheduleLearnTab from "./Tabs/ScheduleLearnTab";
 
 const ManageCourse = () => {
@@ -13,13 +19,25 @@ const ManageCourse = () => {
             <TabsTrigger value="schedule">Lịch học</TabsTrigger>
             <TabsTrigger value="courses">Danh sách khoá học</TabsTrigger>
             <TabsTrigger value="class">Danh sách lớp học</TabsTrigger>
+            <TabsTrigger value="listStudent">
+              Tra cứu danh sách học viên
+            </TabsTrigger>
           </TabsList>
         </div>
 
         {/* <TabsContent value="approve-offline">*/}
-        <ScheduleLearnTab></ScheduleLearnTab>
-        <CourseListTab></CourseListTab>
-        <ClassListTab></ClassListTab>
+        <TabsContent value="schedule">
+          <ScheduleLearnTab />
+        </TabsContent>
+        <TabsContent value="courses">
+          <CourseListTab />
+        </TabsContent>
+        <TabsContent value="class">
+          <ClassListTab />
+        </TabsContent>
+        <TabsContent value="listStudent">
+          <ListStudent />
+        </TabsContent>
       </Tabs>
     </div>
   );

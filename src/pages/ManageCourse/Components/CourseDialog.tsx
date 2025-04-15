@@ -26,7 +26,7 @@ const formatDate = (dateString?: string) =>
 const useCourseForm = (initialData?: CourseType) => {
   const [name, setName] = useState(initialData?.name || "");
   const [type, setType] = useState<string>(
-    initialData?.typeOfLicense?.toString() || ""
+    initialData?.typeOfLicense?.name?.toString() || ""
   );
   const [startDate, setStartDate] = useState(
     formatDate(initialData?.startDate)
@@ -41,6 +41,16 @@ const useCourseForm = (initialData?: CourseType) => {
   const [practiceLessons, setPracticeLessons] = useState(
     initialData?.practiceLessons?.toString() || ""
   );
+
+  const handleSetType = (value: any) => {
+    // If value is an object with an id property, use that
+    if (value && typeof value === "object" && value.id) {
+      setType(value.id);
+    } else {
+      // Otherwise use the value directly (assuming it's a string)
+      setType(value);
+    }
+  };
 
   const hasChanged = (): boolean => {
     if (!initialData) return false;
@@ -78,7 +88,7 @@ const useCourseForm = (initialData?: CourseType) => {
     },
     setters: {
       setName,
-      setType,
+      setType: handleSetType,
       setStartDate,
       setEndDate,
       setMaxStudents,
@@ -117,7 +127,7 @@ const CourseDialog = ({ mode, initialData }: CourseDialogProps) => {
       <AlertDialog>
         <AlertDialogTrigger asChild>
           <Button
-            text={mode === "add" ? "Thêm khoá học mới" : "Chỉnh sửa khoá học"}
+            text={mode === "add" ? "Thêm khoá học mới" : "Sửa"}
             isPrimary
           />
         </AlertDialogTrigger>

@@ -45,7 +45,10 @@ const mockProfileData: Profile = {
       course: {
         id: "course001",
         name: "Khóa học B1 - Sáng",
-        typeOfLicense: "B1",
+        typeOfLicense: {
+          id: "B1",
+          name: "Giấy phép hạng B1",
+        },
         examDate: "2025-05-20",
         startDate: "2025-04-30",
         endDate: "2025-05-30",
