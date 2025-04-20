@@ -1,18 +1,17 @@
 import { useState } from "react";
 import { PersonalData } from "../../store/type/Student";
+import {
+  isValidDate,
+  isValidEmail,
+  isValidPhone,
+} from "../../utils/validation";
 import Button from "../Button/Button";
 import ChooseDayForm from "./Features/ChooseDayForm";
-import PersonalInforForm, {
-  mockGender,
-  typeOfLicense,
-} from "./Features/PersonalInforForm";
+import PersonalInforForm from "./Features/PersonalInforForm";
 import UploadForm from "./Features/UploadForm";
 import "./Form.scss";
-import {
-  isValidPhone,
-  isValidEmail,
-  isValidDate,
-} from "../../utils/validation";
+import axios from "axios";
+import { toast } from "sonner";
 
 const tabs = [
   "Thông tin cá nhân",
@@ -22,19 +21,11 @@ const tabs = [
 
 const Form = () => {
   const [activeTab, setActiveTab] = useState<number>(0);
-
-  const [personalData, setPersonalData] = useState<PersonalData>({
-    name: "",
-    phone: "",
-    gender: mockGender[0].id,
-    birthDate: "",
-    licenseType: typeOfLicense[0].id,
-    email: "",
-  });
+  const [personalData, setPersonalData] = useState<PersonalData | null>(null);
   const [personalImgData, setPersonalImgData] = useState({
     avatar: "",
-    frontImg: "",
-    backImg: "",
+    cardImgFront: "",
+    cardImgBack: "",
   });
   const [chooseData, setChooseData] = useState({
     courseId: "",
@@ -42,12 +33,29 @@ const Form = () => {
   });
 
   const handlePersonalDataChange = (newData: Partial<PersonalData>) => {
-    setPersonalData((prev) => ({
-      ...prev,
-      ...newData,
-    }));
+    console.log("newData", newData);
+    setPersonalData((prev) => {
+      if (prev) {
+        return {
+          ...prev,
+          ...newData,
+        };
+      }
+      return {
+        name: "",
+        identityNumber: "",
+        address: "",
+        phone: "",
+        gender: "",
+        birthDate: "",
+        licenseType: "",
+        email: "",
+        healthCheckDocURL: "",
+      };
+    });
   };
   const handlePersonalImgDataChange = (newData: Partial<any>) => {
+    console.log("newData", newData);
     setPersonalImgData((prev) => ({
       ...prev,
       ...newData,
@@ -62,7 +70,7 @@ const Form = () => {
   };
 
   const validatePersonalInfo = () => {
-    if (!personalData.name) {
+    if (!personalData?.name) {
       alert("Họ và tên không được để trống!");
       return false;
     }
@@ -82,10 +90,11 @@ const Form = () => {
     return true;
   };
   const validateUploadForm = () => {
+    console.log("personalImgData", personalImgData);
     if (
       !personalImgData.avatar ||
-      !personalImgData.frontImg ||
-      !personalImgData.backImg
+      !personalImgData.cardImgFront ||
+      !personalImgData.cardImgBack
     ) {
       alert("Vui lòng tải lên đầy đủ các hình ảnh được yêu cầu");
       return false;
@@ -101,13 +110,49 @@ const Form = () => {
     return true;
   };
 
-  const handleSummit = () => {
-    var studentInformation = {
-      personalData: personalData,
-      personalImgData: personalImgData,
-      chooseData: chooseData,
-    };
-    console.log(studentInformation);
+  const handleSummit = async () => {
+    try {
+      // var studentInformation = {
+      //   identity_number: personalData?.identityNumber,
+      //   full_name: personalData?.name,
+      //   gender: personalData?.gender,
+      //   phone_number: personalData?.phone,
+      //   date_of_birth: personalData?.birthDate.split("/").reverse().join("-"),
+      //   address: personalData?.address,
+      //   email: personalData?.email,
+      //   license_type_id: personalData?.licenseType,
+      //   identity_image_front: personalImgData.cardImgFront,
+      //   identity_image_back: personalImgData.cardImgBack,
+      //   avatar: personalImgData.avatar,
+      //   course_id: chooseData.courseId,
+      //   health_check_schedule_id: chooseData.healthCheckId,
+      //   role: "user",
+      // };
+      // console.log("studentInformation", studentInformation);
+      // const response = await axios.post(
+      //   import.meta.env.VITE_API_URL + "/api/course_registration/",
+      //   studentInformation,
+      //   {
+      //     headers: {
+      //       "Content-Type": "application/json",
+      //     },
+      //   }
+      // );
+      // if (response.status === 201) {
+      //   alert("Đăng ký thành công!");
+      //   window.location.reload();
+      // } else {
+      //   alert("Đã xảy ra lỗi trong quá trình gửi thông tin. Vui lòng thử lại.");
+      // }
+      toast.success("Đăng ký thành công!", {
+        description: "Vui lòng kiểm tra email để biết thêm thông tin chi tiết.",
+        duration: 500000,
+        className: "[&>[data-icon]]:!text-green-500",
+      });
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      alert("Đã xảy ra lỗi trong quá trình gửi thông tin. Vui lòng thử lại.");
+    }
   };
 
   return (
@@ -159,6 +204,7 @@ const Form = () => {
             <ChooseDayForm
               formData={chooseData}
               onFormDataChange={handleChooseDataChange}
+              selectedLicenseId={personalData?.licenseType}
             />
           )}
           {/* Button điều hướng */}

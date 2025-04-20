@@ -1,9 +1,7 @@
-import { LicenseType } from "./Lincense";
-
 export interface CourseType {
   id: string;
   name: string;
-  typeOfLicense: LicenseType; // Loại khóa học
+  licenseTypeId: string; // Loại khóa học
   examDate: string; // Ngày thi
   startDate: string; // Ngày bắt đầu
   endDate: string; // Ngày kết thúc

@@ -76,16 +76,89 @@ interface ChooseDayFormProps {
   onFormDataChange: (
     data: Partial<{ courseId: string; healthCheckId: string }>
   ) => void;
+  selectedLicenseId?: string;
 }
 
-const ChooseDayForm = ({ formData, onFormDataChange }: ChooseDayFormProps) => {
+const ChooseDayForm = ({
+  formData,
+  onFormDataChange,
+  selectedLicenseId,
+}: ChooseDayFormProps) => {
   const [courseData, setCourseData] = useState<CourseType[]>([]);
   const [healthCheckData, setHealthCheckData] = useState<HealthCheckType[]>([]);
+  const [healthCheckFiltered, setHealthCheckListFiltered] = useState<
+    HealthCheckType[]
+  >([]);
+  const [courseFiltered, setCourseListFiltered] = useState<CourseType[]>([]);
+
+  const handleRetieveListCourse = async () => {
+    try {
+      const response = await fetch(
+        import.meta.env.VITE_API_URL + "/api/courses/?skip=0&limit=100"
+      );
+      const data = await response.json();
+      const courses = data.items.map((item: any) => ({
+        id: item.id,
+        name: item.course_name,
+        examDate: item.start_date,
+        registrationDeadline: item.end_date,
+        registeredCount: item.current_students,
+        maxStudents: item.max_students,
+        licenseTypeId: item.license_type_id,
+      }));
+      setCourseData(courses);
+      await handleRetieveListHealthCheck();
+    } catch (error) {
+      console.error("Error fetching course data:", error);
+    }
+  };
+
+  const handleRetieveListHealthCheck = async () => {
+    try {
+      const response = await fetch(
+        import.meta.env.VITE_API_URL +
+          "/api/health_check_schedule/?skip=0&limit=100"
+      );
+      const data = await response.json();
+      const healthChecks = data.items.map((item: any) => ({
+        id: item.id,
+        name: item.description,
+        date: item.scheduled_datetime,
+        address: item.address,
+        courseId: item.course_id,
+      }));
+      setHealthCheckData(healthChecks);
+    } catch (error) {
+      console.error("Error fetching health check data:", error);
+    }
+  };
+
+  console.log("selectedLicenseId", selectedLicenseId);
+  useEffect(() => {
+    if (selectedLicenseId) {
+      console.log("selectedLicenseId", selectedLicenseId);
+      handleRetieveListCourse();
+    }
+  }, [selectedLicenseId]);
 
   useEffect(() => {
-    setCourseData(mockData);
-    setHealthCheckData(mockHealthCheck);
-  }, []);
+    if (selectedLicenseId && courseData.length > 0) {
+      const listCourse = courseData.filter(
+        (course) => course.licenseTypeId === selectedLicenseId
+      );
+      setCourseListFiltered(listCourse);
+      handleCourseSelect(listCourse[0].id);
+    }
+  }, [selectedLicenseId, courseData]);
+
+  useEffect(() => {
+    if (formData.courseId && healthCheckData.length > 0) {
+      const listHealthCheck = healthCheckData.filter(
+        (healthCheck) => healthCheck.courseId === formData.courseId
+      );
+      setHealthCheckListFiltered(listHealthCheck);
+    }
+  }, [formData.courseId, healthCheckData]);
 
   const handleCourseSelect = (courseId: string) => {
     onFormDataChange({ courseId });
@@ -100,7 +173,7 @@ const ChooseDayForm = ({ formData, onFormDataChange }: ChooseDayFormProps) => {
       <div className="Form-choose-course">
         <p>* Chọn một khoá học</p>
         <div className="Form-choose-course-list">
-          {courseData.map((course, index) => (
+          {courseFiltered.map((course, index) => (
             <Course
               data={course}
               isSelected={formData.courseId === course.id}
@@ -112,7 +185,7 @@ const ChooseDayForm = ({ formData, onFormDataChange }: ChooseDayFormProps) => {
       <div className="Form-choose-course">
         <p>* Chọn lịch khám sức khoẻ</p>
         <div className="Form-choose-course-list">
-          {healthCheckData.map((health, index) => (
+          {healthCheckFiltered.map((health, index) => (
             <HealthCheck
               data={health}
               isSelected={formData.healthCheckId === health.id}

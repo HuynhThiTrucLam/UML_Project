@@ -3,6 +3,7 @@ export interface HealthCheckType {
   name: string;
   date: string;
   address: string;
+  courseId: string;
 }
 
 export interface HealthCheckDocument {

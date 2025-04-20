@@ -10,7 +10,7 @@ import {
 import "./Selection.scss";
 
 interface SelectionProps {
-  value?: string;
+  value?: string | null;
   placeholder: string;
   data: any;
   setData: (data: any) => void;
@@ -27,10 +27,9 @@ const Selection = ({
   value,
 }: SelectionProps) => {
   const handleValueChange = (val: string) => {
-    const selectedItem = data.find((item: any) => item.name === val);
-    if (selectedItem) {
+    if (val) {
       // Pass the entire item object to setData
-      setData(selectedItem);
+      setData(val);
     }
   };
 
@@ -39,7 +38,11 @@ const Selection = ({
       <p>{title ? title : "Lọc bằng hạng bằng lái"}</p>
       <Select onValueChange={handleValueChange}>
         <SelectTrigger className="Selection-header">
-          <SelectValue placeholder={value || placeholder} />
+          <SelectValue
+            placeholder={
+              data.find((item: any) => item.id === value)?.name || placeholder
+            }
+          />
         </SelectTrigger>
         <SelectContent className="Selection-container">
           <SelectGroup>
@@ -47,11 +50,7 @@ const Selection = ({
               {lable ? lable : "Lọc theo hạng bằng lái"}
             </SelectLabel>
             {data.map((item: any) => (
-              <SelectItem
-                key={item.id}
-                value={item.name}
-                className="text-[12px]"
-              >
+              <SelectItem key={item.id} value={item.id} className="text-[12px]">
                 {item.name}
               </SelectItem>
             ))}

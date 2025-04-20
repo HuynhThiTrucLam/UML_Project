@@ -3,6 +3,8 @@ import { HealthCheckType } from "./HealthCheck";
 
 export interface PersonalData {
   name: string;
+  identityNumber: string;
+  address: string;
   phone: string;
   gender: string;
   birthDate: string;
