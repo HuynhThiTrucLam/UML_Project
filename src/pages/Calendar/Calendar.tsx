@@ -1,95 +1,27 @@
-import { useEffect, useRef, useState } from "react";
+import axios from "axios";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { default as CalendarIcon } from "../../assets/icons/Calendar";
 import Button from "../../components/Button/Button";
-import { typeOfLicense } from "../../components/Form/Features/PersonalInforForm";
 import Form from "../../components/Form/Form";
-import Selection from "../../components/Select/Select";
 import { ScheduleType } from "../../store/type/ScheduleItem";
 import "./Calendar.scss";
-import AbsentForm from "./Tab/AbsentForm";
-import Learn from "./Tab/Learn";
+import Learn, { formatDate } from "./Tab/Learn";
 import Test from "./Tab/Test";
 
-export const scheduleItems: ScheduleType[] = [
-  {
-    id: "1",
-    courseId: "1",
-    typeOfLicense: "B1",
-    type: "LyThuyet",
-    date: "2025-04-09",
-    startTime: "08:00",
-    endTime: "10:00",
-    location: "Hà Nội",
-    teacher: "Nguyễn Văn A",
-  },
-  {
-    id: "2",
-    courseId: "1",
-    typeOfLicense: "B1",
-    type: "ThucHanh",
-    date: "2025-04-10",
-    startTime: "08:00",
-    endTime: "10:00",
-    location: "Hà Nội",
-    teacher: "Nguyễn Văn A",
-  },
-  {
-    id: "3",
-    courseId: "1",
-    typeOfLicense: "B1",
-    type: "Thi",
-    date: "2025-04-08",
-    startTime: "08:00",
-    endTime: "10:00",
-    location: "Hà Nội",
-    teacher: "Nguyễn Văn A",
-  },
-  {
-    id: "4",
-    courseId: "2",
-    typeOfLicense: "B2",
-    type: "LyThuyet",
-    date: "2025-04-11",
-    startTime: "08:00",
-    endTime: "10:00",
-    location: "Hà Nội",
-    teacher: "Nguyễn Văn B",
-  },
-  {
-    id: "5",
-    courseId: "2",
-    typeOfLicense: "B2",
-    type: "ThucHanh",
-    date: "2025-04-12",
-    startTime: "12:00",
-    endTime: "16:00",
-    location: "Hà Nội",
-    teacher: "Nguyễn Văn B",
-  },
-  {
-    id: "6",
-    courseId: "2",
-    typeOfLicense: "B2",
-    type: "Thi",
-    date: "2025-04-13",
-    startTime: "08:00",
-    endTime: "10:00",
-    location: "Hà Nội",
-    teacher: "Nguyễn Văn B",
-  },
-];
+const tabs = ["Lịch học lý thuyết", "Lịch học thực hành", "Lịch thi"];
 
-const tabs = [
-  "Lịch học",
-  "Lịch thi",
-  " Form xin thay đổi lịch học / lịch thi / lịch dạy",
-];
+interface ScheduleTypeFiltered {
+  type: string;
+  data: ScheduleType[];
+}
 
 const Calendar = () => {
   const [scheduleData, setScheduleData] = useState<ScheduleType[]>([]);
-
+  const [date, setDate] = useState<Date>(new Date());
   const [activeTab, setActiveTab] = useState<number>(0);
-  const [licenseType, setLicenseType] = useState<string>(typeOfLicense[0].name);
+  const [scheduleDataFiltered, setScheduleDataFiltered] = useState<
+    ScheduleTypeFiltered[]
+  >([]);
 
   const formRef = useRef<HTMLDivElement>(null);
 
@@ -97,10 +29,71 @@ const Calendar = () => {
     formRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const getCourseForCalendar = useCallback(
+    async (selectedDate: Date | undefined) => {
+      if (!selectedDate) return;
+
+      setDate(selectedDate);
+
+      const startOfWeek = new Date(selectedDate);
+      startOfWeek.setDate(selectedDate.getDate() - selectedDate.getDay() + 1); // Monday
+
+      const endOfWeek = new Date(selectedDate);
+      endOfWeek.setDate(selectedDate.getDate() - selectedDate.getDay() + 7); // Sunday
+
+      try {
+        const response = await axios.get(
+          `${
+            import.meta.env.VITE_API_URL
+          }/api/schedule/?start_time=${formatDate(
+            startOfWeek
+          )}&end_time=${formatDate(endOfWeek)}`
+        );
+
+        const scheduleItems = response.data.items.map(
+          (item: any): ScheduleType => ({
+            id: item.id,
+            courseId: item.course_id,
+            typeOfLicense: {
+              id: item.license_type.id,
+              name: item.license_type.type_name,
+            },
+            type: item.type,
+            startTime: item.start_time,
+            endTime: item.end_time,
+            location: item.location,
+            teacher: item.teacher_name,
+          })
+        );
+
+        setScheduleData(scheduleItems);
+      } catch (error) {
+        console.error("Error fetching schedule data:", error);
+      }
+    },
+    []
+  );
+
   useEffect(() => {
-    //Goi API de lay lich hoc cua tuan hien tai
-    setScheduleData(scheduleItems);
-  });
+    getCourseForCalendar(date);
+  }, []);
+
+  useEffect(() => {
+    const filteredData: ScheduleTypeFiltered[] = [];
+
+    scheduleData.forEach((item) => {
+      const existingType = filteredData.find((data) => data.type === item.type);
+
+      if (existingType) {
+        existingType.data.push(item);
+      } else {
+        filteredData.push({ type: item.type, data: [item] });
+      }
+    });
+
+    setScheduleDataFiltered(filteredData);
+  }, [scheduleData]);
+
   return (
     <div className="Calendar">
       <div className="Calendar-container">
@@ -138,20 +131,36 @@ const Calendar = () => {
               </div>
             ))}
           </div>
-          <div className="Calendar-filter">
-            <Selection
-              placeholder={licenseType}
-              data={typeOfLicense}
-              setData={() => {
-                setLicenseType;
-              }}
-            ></Selection>
-          </div>
         </div>
         <div className="Calendar-content">
-          {activeTab === 0 && <Learn scheduleData={scheduleData}></Learn>}
-          {activeTab === 1 && <Test schedulData={scheduleData}></Test>}
-          {activeTab === 2 && <AbsentForm></AbsentForm>}
+          {activeTab === 0 && (
+            <Learn
+              scheduleData={
+                scheduleDataFiltered.find((item) => item.type === "theory")
+                  ?.data || []
+              }
+              date={date}
+              getCourseForCalendar={getCourseForCalendar}
+            ></Learn>
+          )}
+          {activeTab === 1 && (
+            <Learn
+              scheduleData={
+                scheduleDataFiltered.find((item) => item.type === "practice")
+                  ?.data || []
+              }
+              date={date}
+              getCourseForCalendar={getCourseForCalendar}
+            ></Learn>
+          )}
+          {activeTab === 2 && (
+            <Test
+              scheduleData={
+                scheduleDataFiltered.find((item) => item.type === "exam")
+                  ?.data || []
+              }
+            ></Test>
+          )}
         </div>
         <div ref={formRef}>
           <Form />

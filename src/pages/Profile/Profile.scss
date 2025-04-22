@@ -68,7 +68,8 @@
     margin-top: 1rem;
     &-content {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: 1fr;
+      // grid-template-columns: repeat(3, 1fr);
       gap: 2rem;
       justify-content: center;
       padding: 1rem 2rem;

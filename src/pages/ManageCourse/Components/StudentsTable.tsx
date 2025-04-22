@@ -11,6 +11,7 @@ import {
   TableRow,
 } from "../../../components/ui/table";
 import { mockStudents } from "../Tabs/ListStudentTab";
+import axios from "axios";
 
 interface StudentsTableProps {
   data: mockStudents[] | [];

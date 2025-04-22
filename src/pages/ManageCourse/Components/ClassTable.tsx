@@ -15,6 +15,8 @@ import {
 } from "../../../components/ui/table";
 import { ClassType, TypeOfClass } from "../../../store/type/Class";
 import ClassDialog from "./ClassDialog";
+import axios from "axios";
+import dayjs from "dayjs";
 
 export const mockTypeOfClass: TypeOfClass[] = [
   {
@@ -31,85 +33,85 @@ export const mockTypeOfClass: TypeOfClass[] = [
   },
 ];
 
-const mockClassData: ClassType[] = [
-  {
-    id: "cls001",
-    name: "Lớp Lý Thuyết A1",
-    course: {
-      id: "crs001",
-      name: "Khóa học A1 cơ bản",
-      typeOfLicense: { id: "A1", name: "Giấy phép lái xe A1" },
-      examDate: "2025-05-25",
-      startDate: "2025-04-10",
-      endDate: "2025-05-25",
-      registeredCount: 15,
-      maxStudents: 30,
-      theoryLessons: 10,
-      practiceLessons: 5,
-    },
-    date: "2025-04-15",
-    startTime: "08:00",
-    endTime: "10:00",
-    type: {
-      id: "Theory",
-      name: "Lý thuyết",
-    },
-    location: "Phòng 101, Trung tâm A",
-    teacher: "Nguyễn Văn A",
-    maxStudents: 30,
-  },
-  {
-    id: "cls002",
-    name: "Lớp Thực Hành A2",
-    course: {
-      id: "crs002",
-      name: "Khóa học A2 nâng cao",
-      typeOfLicense: { id: "A2", name: "Giấy phép lái xe A2" },
-      examDate: "2025-06-10",
-      startDate: "2025-04-20",
-      endDate: "2025-06-10",
-      registeredCount: 10,
-      maxStudents: 20,
-      theoryLessons: 8,
-      practiceLessons: 12,
-    },
-    date: "2025-04-20",
-    startTime: "14:00",
-    endTime: "16:00",
-    type: {
-      id: "Practice",
-      name: "Thực hành",
-    },
-    location: "Sân tập B - Cơ sở 2",
-    teacher: "Trần Thị B",
-    maxStudents: 20,
-  },
-  {
-    id: "cls003",
-    name: "Lớp Thi A1",
-    course: {
-      id: "crs001",
-      name: "Khóa học A1 cơ bản",
-      typeOfLicense: { id: "A1", name: "Giấy phép lái xe A1" },
-      examDate: "2025-05-25",
-      startDate: "2025-04-10",
-      endDate: "2025-05-25",
-      registeredCount: 15,
-      maxStudents: 30,
-      theoryLessons: 10,
-      practiceLessons: 5,
-    },
-    date: "2025-05-20",
-    startTime: "08:00",
-    endTime: "12:00",
-    type: {
-      id: "Exam",
-      name: "Thi",
-    },
-    location: "Phòng thi số 3",
-    maxStudents: 25,
-  },
-];
+// const mockClassData: ClassType[] = [
+//   {
+//     id: "cls001",
+//     name: "Lớp Lý Thuyết A1",
+//     course: {
+//       id: "crs001",
+//       name: "Khóa học A1 cơ bản",
+//       typeOfLicense: { id: "A1", name: "Giấy phép lái xe A1" },
+//       examDate: "2025-05-25",
+//       startDate: "2025-04-10",
+//       endDate: "2025-05-25",
+//       registeredCount: 15,
+//       maxStudents: 30,
+//       theoryLessons: 10,
+//       practiceLessons: 5,
+//     },
+//     date: "2025-04-15",
+//     startTime: "08:00",
+//     endTime: "10:00",
+//     type: {
+//       id: "Theory",
+//       name: "Lý thuyết",
+//     },
+//     location: "Phòng 101, Trung tâm A",
+//     teacher: "Nguyễn Văn A",
+//     maxStudents: 30,
+//   },
+//   {
+//     id: "cls002",
+//     name: "Lớp Thực Hành A2",
+//     course: {
+//       id: "crs002",
+//       name: "Khóa học A2 nâng cao",
+//       typeOfLicense: { id: "A2", name: "Giấy phép lái xe A2" },
+//       examDate: "2025-06-10",
+//       startDate: "2025-04-20",
+//       endDate: "2025-06-10",
+//       registeredCount: 10,
+//       maxStudents: 20,
+//       theoryLessons: 8,
+//       practiceLessons: 12,
+//     },
+//     date: "2025-04-20",
+//     startTime: "14:00",
+//     endTime: "16:00",
+//     type: {
+//       id: "Practice",
+//       name: "Thực hành",
+//     },
+//     location: "Sân tập B - Cơ sở 2",
+//     teacher: "Trần Thị B",
+//     maxStudents: 20,
+//   },
+//   {
+//     id: "cls003",
+//     name: "Lớp Thi A1",
+//     course: {
+//       id: "crs001",
+//       name: "Khóa học A1 cơ bản",
+//       typeOfLicense: { id: "A1", name: "Giấy phép lái xe A1" },
+//       examDate: "2025-05-25",
+//       startDate: "2025-04-10",
+//       endDate: "2025-05-25",
+//       registeredCount: 15,
+//       maxStudents: 30,
+//       theoryLessons: 10,
+//       practiceLessons: 5,
+//     },
+//     date: "2025-05-20",
+//     startTime: "08:00",
+//     endTime: "12:00",
+//     type: {
+//       id: "Exam",
+//       name: "Thi",
+//     },
+//     location: "Phòng thi số 3",
+//     maxStudents: 25,
+//   },
+// ];
 
 const ClassTable = () => {
   const [classes, setClasses] = useState<ClassType[]>([]);
@@ -133,9 +135,89 @@ const ClassTable = () => {
     console.log("Delete class");
   };
 
+  const retriveClasses = async () => {
+    try {
+      const today = new Date();
+      const startDate = new Date(today);
+      startDate.setDate(today.getDate() - 30);
+      const endDate = new Date(today);
+      endDate.setDate(today.getDate() + 30);
+      const startTime = dayjs(startDate).format("YYYY-MM-DD");
+      const endTime = dayjs(endDate).format("YYYY-MM-DD");
+      console.log("startTime", startTime);
+      console.log("endTime", endTime);
+      const response = await axios.get(
+        `${
+          import.meta.env.VITE_API_URL
+        }/api/schedule/?start_time=2023-10-01&end_time=2025-10-07`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
+          },
+        }
+      );
+      if (response.status === 200) {
+        // {
+        //   "course_id": "5b1df47f-46d5-4c54-a237-b1e23eb914b9",
+        //   "start_time": "2025-04-21T07:00:00.207000",
+        //   "end_time": "2025-04-21T09:00:00.208000",
+        //   "location": "string",
+        //   "type": "theory",
+        //   "instructor_id": null,
+        //   "max_students": 65,
+        //   "course": {
+        //     "id": "5b1df47f-46d5-4c54-a237-b1e23eb914b9",
+        //     "name": "Khóa học A1 nâng cao"
+        //   },
+        //   "id": "b74c9f8c-c4ca-46cc-a39a-6a486bac0db0",
+        //   "license_type": {
+        //     "id": "2533a434-35c7-47fa-9306-8e45da5ec3b4",
+        //     "type_name": "Hạng bằng lái A1"
+        //   }
+        // },
+        const data = response.data.items.map((item: any) => ({
+          id: item.id,
+          name: item.name,
+          course: {
+            id: item.course.id,
+            name: item.course.name,
+            licenseType: item.license_type,
+          },
+          date: new Date(item.start_time).toLocaleDateString("vi-VN"),
+          startTime: new Date(item.start_time).toLocaleTimeString("vi-VN", {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+          endTime: new Date(item.end_time).toLocaleTimeString("vi-VN", {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+          type: {
+            id: item.type,
+            name:
+              item.type === "theory"
+                ? "Lý thuyết"
+                : item.type === "practice"
+                ? "Thực hành"
+                : "Thi",
+          },
+          location: item.location,
+          maxStudents: item.max_students,
+        }));
+        setClasses(data);
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.error("Error fetching classes:", error.message);
+      } else {
+        console.error("Unexpected error:", error);
+      }
+    }
+  };
+
   useEffect(() => {
     //Call API to get all classes
-    setClasses(mockClassData);
+    retriveClasses();
   }, []);
 
   return (
@@ -195,12 +277,14 @@ const ClassTable = () => {
             <TableBody>
               {classes.map((cls) => (
                 <TableRow key={cls.id} className="border border-gray-200">
-                  <TableCell className="text-center border">{cls.id}</TableCell>
                   <TableCell className="text-center border">
-                    {cls.course.id}
+                    {cls.id.split("-")[1]}
                   </TableCell>
                   <TableCell className="text-center border">
-                    {cls.course.typeOfLicense.name}
+                    {cls.course.id.split("-")[1]}
+                  </TableCell>
+                  <TableCell className="text-center border">
+                    {cls.course?.licenseType?.type_name}
                   </TableCell>
                   <TableCell className="text-center border">
                     {cls.type.name}

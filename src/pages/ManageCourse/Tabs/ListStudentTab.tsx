@@ -1,13 +1,14 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Card, CardContent } from "../../../components/ui/card";
 import { TabsContent } from "../../../components/ui/tabs";
 import Button from "../../../components/Button/Button";
 import Selection from "../../../components/Select/Select";
-import { typeOfLicense } from "../../../components/Form/Features/PersonalInforForm";
 import { mockCourseList, mockTypeOfClassList } from "../Components/ClassDialog";
 import StudentsTable from "../Components/StudentsTable";
 import { CourseType } from "../../../store/type/Course";
 import { ClassType } from "../../../store/type/Class";
+import axios from "axios";
+import { useAuth } from "../../../store/AuthContext";
 
 export interface mockStudents {
   id: string;
@@ -83,6 +84,7 @@ const ListStudentTab = () => {
   const [students, setStudents] = useState<mockStudents[]>([]);
   const [selectedCourse, setSelectedCourse] = useState<CourseType>();
   const [selectedClass, setSelectedClass] = useState<ClassType>();
+  const { user } = useAuth();
 
   const handlePrint = () => {
     // Gọi API để in danh sách học viên
@@ -96,6 +98,35 @@ const ListStudentTab = () => {
     setStudents(mockStudents);
   };
 
+  const retrieveStudents = async () => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/students`,
+        {
+          headers: {
+            Authorization: `Bearer ${user?.token}`,
+          },
+        }
+      );
+      if (response.status === 200) {
+        const studentsData = response.data.map((student: any) => ({
+          id: student.id.split("-")[1],
+          name: student.user.user_name,
+          theoryScore: student.theoryScore || "",
+          practiceScore: student.practiceScore || "",
+        }));
+        setStudents(studentsData);
+      }
+    } catch (error) {
+      console.error("Error retrieving students:", error);
+      // Handle the error
+    }
+  };
+
+  useEffect(() => {
+    // Gọi API để lấy danh sách học viên khi component được mount
+    retrieveStudents();
+  }, []);
   return (
     <div className="ManageCourse-student">
       <TabsContent value="listStudent">

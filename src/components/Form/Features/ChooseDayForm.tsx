@@ -4,6 +4,7 @@ import Course from "../../Course/Course";
 import HealthCheck from "../../Course/HealthCheck";
 import { CourseType } from "../../../store/type/Course";
 import { HealthCheckType } from "../../../store/type/HealthCheck";
+import axios from "axios";
 const mockData = [
   {
     id: "A1-001",
@@ -93,10 +94,10 @@ const ChooseDayForm = ({
 
   const handleRetieveListCourse = async () => {
     try {
-      const response = await fetch(
+      const response = await axios.get(
         import.meta.env.VITE_API_URL + "/api/courses/?skip=0&limit=100"
       );
-      const data = await response.json();
+      const data = response.data;
       const courses = data.items.map((item: any) => ({
         id: item.id,
         name: item.course_name,
@@ -136,7 +137,6 @@ const ChooseDayForm = ({
   console.log("selectedLicenseId", selectedLicenseId);
   useEffect(() => {
     if (selectedLicenseId) {
-      console.log("selectedLicenseId", selectedLicenseId);
       handleRetieveListCourse();
     }
   }, [selectedLicenseId]);

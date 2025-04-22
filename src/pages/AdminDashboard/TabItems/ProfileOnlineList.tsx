@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import FilterArrow from "../../../assets/icons/FilterArrow";
 import Button from "../../../components/Button/Button";
-import { typeOfLicense } from "../../../components/Form/Features/PersonalInforForm";
 import SearchBar from "../../../components/Searchbar/SearchBar";
 import Selection from "../../../components/Select/Select";
 import { Card, CardContent, CardHeader } from "../../../components/ui/card";
@@ -16,29 +15,39 @@ import {
 } from "../../../components/ui/table";
 import { TabsContent } from "../../../components/ui/tabs";
 import { LicenseType } from "../../../store/type/Lincense";
-import { mockRegistrations, Profile } from "../../../store/type/Profile";
+import { Profile } from "../../../store/type/Profile";
 import "../AdminDashboard.scss";
 import RegisterateDetail from "../Detail/RegisterateDetail";
+import axios from "axios";
 
 const ProfileOnlineList = () => {
+  const [typeOfLicenses, setTypeOfLicenses] = useState<LicenseType[]>([]);
+  const [searchValue, setSearchValue] = useState("");
+  const [searchResult, setSearchResult] = useState<Profile[]>([]);
   const [onlineRegistrations, setOnlineRegistrations] = useState<Profile[]>([]);
-
-  const [licenseType, setLicenseType] = useState<LicenseType>(typeOfLicense[0]);
-  const [search, setSearch] = useState<string>("");
-
-  const handleSearch = (value: string) => {
-    setSearch(value);
-    console.log("Searching for:", search);
-  };
-
-  const handleApprove = (itemID: string) => {
-    console.log(`Hồ sơ ${itemID} được duyệt (chờ thanh toán)`);
-    // TODO: Call API to update status from "pending" -> "payment"
-  };
-
-  const handleReject = (itemID: string) => {
+  const [licenseType, setLicenseType] = useState<LicenseType>(
+    typeOfLicenses[0]
+  );
+  const handleUpdateRegistration = async (itemID: string, status: string) => {
     console.log(`Hồ sơ ${itemID} bị từ chối`);
-    // TODO: Call API to reject the registration
+    try {
+      const response = await axios.put(
+        import.meta.env.VITE_API_URL + `/api/course_registration/${itemID}`,
+        {
+          status,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("Hồ sơ đã bị từ chối:", response.data);
+      // Update the state to remove the rejected item
+      await RetrieveListOnlineRegistration();
+    } catch (error) {
+      console.error("Error rejecting hồ sơ:", error);
+    }
   };
 
   const handleFilterByDate = () => {
@@ -60,26 +69,62 @@ const ProfileOnlineList = () => {
   const handleFilterByLicenseType = () => {
     console.log("Đã lọc hồ sơ theo loại giấy phép");
     const filtered = onlineRegistrations.filter(
-      (item) => item.studentInfor.personalData.licenseType === licenseType.name
+      (item) => item.studentInfor.personalData.licenseType === licenseType?.name
     );
     setOnlineRegistrations(filtered);
   };
 
-  const handleConfirm = (itemID: string) => {
-    console.log(`Hồ sơ ${itemID} đã xác nhận`);
-    // TODO: Call API to update status from "payment" -> "successful"
+  const getTypeOfLicense = async () => {
+    try {
+      const response = await axios.get(
+        import.meta.env.VITE_API_URL + "/api/license_type/?skip=0&limit=100"
+      );
+      const licenseTypes = response.data.items.map((item: any) => ({
+        id: item.id,
+        name: item.type_name,
+      }));
+      // return licenseTypes;
+      setTypeOfLicenses(licenseTypes);
+    } catch (error) {
+      console.error("Error fetching license types:", error);
+      return [];
+    }
   };
-
+  const RetrieveListOnlineRegistration = async () => {
+    try {
+      const response = await axios.get(
+        import.meta.env.VITE_API_URL + "/api/course_registration?type=online"
+      );
+      const data: Profile[] = response.data;
+      setOnlineRegistrations(data);
+      setSearchResult(data);
+    } catch (error) {
+      console.error("Error fetching online registrations:", error);
+    }
+  };
   useEffect(() => {
-    // call API to get all profile having method = "Online" and status = "pending" or "payment"
-    const filtered = mockRegistrations.filter(
-      (item) =>
-        (item.method === "Online" && item.status === "pending") ||
-        item.status === "payment"
-    );
-    setOnlineRegistrations(filtered);
+    RetrieveListOnlineRegistration();
+    getTypeOfLicense();
   }, []);
 
+  useEffect(() => {
+    if (searchValue === "") {
+      setSearchResult(onlineRegistrations);
+      return;
+    }
+    const filtered = onlineRegistrations.filter((item) => {
+      const idMatch = item.id.toLowerCase().includes(searchValue.toLowerCase());
+      const nameMatch = item.studentInfor.personalData.name
+        .toLowerCase()
+        .includes(searchValue.toLowerCase());
+      return idMatch || nameMatch;
+    });
+    setSearchResult(filtered);
+  }, [searchValue, onlineRegistrations]);
+
+  const onSearch = (value: string) => {
+    setSearchValue(value);
+  };
   return (
     <div className="ManageProfile-approve">
       <TabsContent value="approve-online">
@@ -90,14 +135,13 @@ const ProfileOnlineList = () => {
               <div className="ManageProfile-search">
                 <SearchBar
                   placeholder="Tìm kiếm hồ sơ"
-                  onChange={() => {}}
-                  onSearch={() => {}}
+                  onChange={onSearch}
                 ></SearchBar>
               </div>
               <div className="ManageProfile-type">
                 <Selection
-                  placeholder={licenseType.name}
-                  data={typeOfLicense}
+                  placeholder={licenseType?.name}
+                  data={typeOfLicenses}
                   setData={(type) => {
                     setLicenseType(type);
                     handleFilterByLicenseType();
@@ -142,13 +186,13 @@ const ProfileOnlineList = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {onlineRegistrations.map((item) => (
+                {searchResult.map((item) => (
                   <TableRow
                     key={item.id}
                     className="border border-gray-200 hover:bg-gray-100"
                   >
                     <TableCell className="text-center border border-gray-200">
-                      {item.id}
+                      {item.id.split("-")[1]}
                     </TableCell>
                     <TableCell className="text-center border border-gray-200">
                       {item.studentInfor.personalData.name}
@@ -156,33 +200,66 @@ const ProfileOnlineList = () => {
                     <TableCell className="text-center border border-gray-200">
                       {item.registrationDate}
                     </TableCell>
-                    <TableCell className="text-center border border-gray-200">
+                    <TableCell
+                      className="text-center border border-gray-200"
+                      style={{
+                        textTransform: "capitalize",
+                        color:
+                          item.status === "pending"
+                            ? "#FFB800"
+                            : item.status === "approved"
+                            ? "#00B0FF"
+                            : item.status === "payment"
+                            ? // blue #00B0FF
+                              "#00B0FF"
+                            : item.status === "successful"
+                            ? "#00C853"
+                            : item.status === "rejected"
+                            ? "#FF3D00"
+                            : "#000000",
+                      }}
+                    >
                       {item.status}
                     </TableCell>
                     <TableCell className="text-center border border-gray-200">
-                      <RegisterateDetail
-                        registerID={item.id}
-                      ></RegisterateDetail>
+                      <RegisterateDetail data={item}></RegisterateDetail>
                     </TableCell>
                     <TableCell className="ManageProfile-approve-action text-center border border-gray-200 space-x-2">
-                      <Button
-                        text="Từ chối"
-                        isPrimary={false}
-                        onClick={() => handleReject(item.id)}
-                      />
-
+                      {["successful", "rejected"].includes(item.status) ? (
+                        <Button
+                          text="Xóa hồ sơ"
+                          isPrimary={false}
+                          onClick={() =>
+                            handleUpdateRegistration(item.id, "deleted")
+                          }
+                        />
+                      ) : (
+                        <Button
+                          text="Từ chối"
+                          isPrimary={false}
+                          onClick={() =>
+                            handleUpdateRegistration(item.id, "rejected")
+                          }
+                        />
+                      )}
                       {item.status === "payment" ? (
                         <Button
                           text="Xác nhận"
                           isPrimary={true}
-                          onClick={() => handleConfirm(item.id)}
+                          onClick={() =>
+                            handleUpdateRegistration(item.id, "successful")
+                          }
                         />
-                      ) : (
+                      ) : item.status === "pending" ? (
                         <Button
                           text="Duyệt hồ sơ"
                           isPrimary={true}
-                          onClick={() => handleApprove(item.id)}
+                          onClick={() =>
+                            handleUpdateRegistration(item.id, "payment")
+                          }
                         />
+                      ) : (
+                        ""
                       )}
                     </TableCell>
                   </TableRow>

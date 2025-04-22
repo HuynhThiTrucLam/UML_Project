@@ -35,7 +35,9 @@ const Selection = ({
 
   return (
     <div className="Selection">
-      <p>{title ? title : "Lọc bằng hạng bằng lái"}</p>
+      <p className="text-[12px] text-primary font-semibold">
+        {title ? title : "Lọc bằng hạng bằng lái"}
+      </p>
       <Select onValueChange={handleValueChange}>
         <SelectTrigger className="Selection-header">
           <SelectValue

@@ -1,25 +1,36 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import UserLayout from "./layouts/UserLayout";
 import Notfound from "./pages/NotFound/Notfound";
 import "./App.css";
 import Login from "./pages/Login/Login";
 import AdminLayout from "./layouts/AdminLayout";
+import { AuthProvider } from "./store/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
-    <Routes>
-      {/* User Routes */}
-      <Route path="/*" element={<UserLayout />} />
+    <AuthProvider>
+      <Routes>
+        {/* User Routes */}
+        <Route path="/*" element={<UserLayout />} />
 
-      {/*Login Page*/}
-      <Route path="/login" element={<Login />} />
+        {/* Admin Login Page - Accessible without authentication */}
+        <Route path="/admin/login" element={<Login />} />
 
-      {/* Register Page */}
-      {/* Admin Routes */}
-      <Route path="/admin/*" element={<AdminLayout />} />
+        {/* Redirect /admin to /admin/dashboard */}
+        <Route
+          path="/admin"
+          element={<Navigate to="/admin/dashboard" replace />}
+        />
 
-      <Route path="*" element={<Notfound />} />
-    </Routes>
+        {/* Protected Admin Routes */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="/admin/*" element={<AdminLayout />} />
+        </Route>
+
+        <Route path="*" element={<Notfound />} />
+      </Routes>
+    </AuthProvider>
   );
 }
 

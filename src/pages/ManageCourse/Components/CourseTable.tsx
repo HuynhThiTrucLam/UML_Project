@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import FilterArrow from "../../../assets/icons/FilterArrow";
 import Button from "../../../components/Button/Button";
-import { typeOfLicense } from "../../../components/Form/Features/PersonalInforForm";
+// import { typeOfLicense } from "../../../components/Form/Features/PersonalInforForm";
 import SearchBar from "../../../components/Searchbar/SearchBar";
 import Selection from "../../../components/Select/Select";
 import { Card, CardContent } from "../../../components/ui/card";
@@ -16,74 +16,28 @@ import {
 } from "../../../components/ui/table";
 import { CourseType } from "../../../store/type/Course";
 import { LicenseType } from "../../../store/type/Lincense";
-import CourseDialog from "./CourseDialog";
+import axios from "axios";
+// import CourseDialog from "./CourseDialog";
 
-// Mock data
-export const mockCourses: CourseType[] = [
-  {
-    id: "course-001",
-    name: "Khóa học lái xe B1 - Tháng 4",
-    typeOfLicense: { id: "3", name: "Bằng lái B1" },
-    examDate: "2025-08-10",
-    startDate: "2025-04-15",
-    endDate: "2025-08-05",
-    registeredCount: 25,
-    maxStudents: 30,
-    theoryLessons: 0,
-    practiceLessons: 0,
-  },
-  {
-    id: "course-002",
-    name: "Khóa học lái xe B2 - Tháng 5",
-    typeOfLicense: { id: "4", name: "Bằng lái B2" },
-    examDate: "2025-09-01",
-    startDate: "2025-05-10",
-    endDate: "2025-08-28",
-    registeredCount: 28,
-    maxStudents: 30,
-    theoryLessons: 0,
-    practiceLessons: 0,
-  },
-  {
-    id: "course-003",
-    name: "Khóa học lái xe C - Tháng 6",
-    typeOfLicense: { id: "5", name: "Bằng lái C" },
-    examDate: "2025-10-15",
-    startDate: "2025-06-05",
-    endDate: "2025-10-01",
-    registeredCount: 18,
-    maxStudents: 25,
-    theoryLessons: 0,
-    practiceLessons: 0,
-  },
-  {
-    id: "course-004",
-    name: "Khóa học lái xe B1 - Tháng 7",
-    typeOfLicense: { id: "3", name: "Bằng lái B1" },
-    examDate: "2025-11-12",
-    startDate: "2025-07-10",
-    endDate: "2025-11-05",
-    registeredCount: 30,
-    maxStudents: 30,
-    theoryLessons: 0,
-    practiceLessons: 0,
-  },
-  {
-    id: "course-005",
-    name: "Khóa học lái xe B2 - Tháng 4 (Tối)",
-    typeOfLicense: { id: "4", name: "Bằng lái B2" },
-    examDate: "2025-08-20",
-    startDate: "2025-04-20",
-    endDate: "2025-08-15",
-    registeredCount: 15,
-    maxStudents: 30,
-    theoryLessons: 0,
-    practiceLessons: 0,
-  },
-];
-
+// "course_name": "Khóa học A1 nâng cao",
+//     "license_type_id": "2533a434-35c7-47fa-9306-8e45da5ec3b4",
+//     "start_date": "2025-05-01",
+//     "end_date": "2025-06-30",
+//     "max_students": 30,
+//     "price": 2500000,
+//     "status": "active",
+//     "id": "5b1df47f-46d5-4c54-a237-b1e23eb914b9",
+//     "current_students": 10,
+//     "created_at": "2025-04-20",
+//     "updated_at": "2025-04-20"
 const CourseTable = () => {
   const [courses, setCourses] = useState<CourseType[]>([]);
+  const typeOfLicense: LicenseType[] = [
+    { id: "0", name: "Tất cả" },
+    { id: "Bằng lái B1", name: "Bằng lái B1" },
+    { id: "Bằng lái B2", name: "Bằng lái B2" },
+    { id: "Bằng lái C", name: "Bằng lái C" },
+  ];
   const [licenseType, setLicenseType] = useState<LicenseType>(typeOfLicense[0]);
   const [searchString, setSearchString] = useState<string>("");
 
@@ -100,21 +54,41 @@ const CourseTable = () => {
     if (typeId === "0") {
       //Call API to get all courses
       console.log("Get all course", typeId);
-      setCourses(mockCourses);
+      // setCourses(mockCourses);
       return;
     }
 
     console.log("GetCourseById", typeId);
-    const filtered = mockCourses.filter(
-      (course) => course.typeOfLicense.id === typeId
-    );
-    setCourses(filtered);
+    // const filtered = mockCourses.filter(
+    //   (course) => course.licenseType.id === typeId
+    // );
+    // setCourses(filtered);
+  };
+
+  const retrieveListCourses = async () => {
+    try {
+      const response = await axios.get(
+        import.meta.env.VITE_API_URL + "/api/courses/?skip=0&limit=100"
+      );
+      const courses = response.data.items.map((item: any) => ({
+        id: item.id.split("-")[1],
+        name: item.course_name,
+        licenseType: item.license_type,
+        startDate: item.start_date,
+        endDate: item.end_date,
+        registeredCount: item.current_students,
+        maxStudents: item.max_students,
+        examDate: item.exam_date,
+      }));
+      setCourses(courses);
+    } catch (error) {
+      console.error("Error fetching courses:", error);
+    }
   };
 
   useEffect(() => {
-    // Replace with API call
-    setCourses(mockCourses);
-  }, [courses]);
+    retrieveListCourses();
+  }, []);
 
   return (
     <div>
@@ -164,7 +138,6 @@ const CourseTable = () => {
                 <TableHead className="text-center border">
                   Số học viên
                 </TableHead>
-                <TableHead className="text-center border">Số buổi</TableHead>
                 <TableHead className="text-center border">
                   Ngày thi dự kiến
                 </TableHead>
@@ -178,7 +151,7 @@ const CourseTable = () => {
                     {course.id}
                   </TableCell>
                   <TableCell className="text-center border">
-                    {course.typeOfLicense.name}
+                    {course.licenseType?.type_name}
                   </TableCell>
                   <TableCell className="text-center border">
                     {`${course.startDate} - ${course.endDate}`}
@@ -186,11 +159,11 @@ const CourseTable = () => {
                   <TableCell className="text-center border">
                     {`${course.registeredCount}/${course.maxStudents}`}
                   </TableCell>
-                  <TableCell className="text-center border">
+                  {/* <TableCell className="text-center border">
                     {`${course.theoryLessons} LT + ${course.practiceLessons} TH`}
-                  </TableCell>
+                  </TableCell> */}
                   <TableCell className="text-center border">
-                    {course.examDate}
+                    {course.endDate}
                   </TableCell>
                   <TableCell className="flex justify-center gap-2 text-center border">
                     <Button
@@ -198,7 +171,7 @@ const CourseTable = () => {
                       isPrimary={false}
                       onClick={() => handleDeleteCourse(course.id)}
                     />
-                    <CourseDialog mode="edit" initialData={course} />
+                    {/* <CourseDialog mode="edit" initialData={course} /> */}
                   </TableCell>
                 </TableRow>
               ))}

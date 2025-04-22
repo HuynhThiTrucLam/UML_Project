@@ -13,35 +13,15 @@
 
     .calendar-header {
       display: grid;
-      grid-template-columns: repeat(8, 1fr);
+      grid-template-columns: repeat(7, 1fr);
       border-bottom: 1px solid #e2e8f0;
 
-      .time-column,
       .day-column {
         font-size: 12px;
         padding: 1.5rem 0.5rem;
         border-right: 1px solid #e2e8f0;
         text-align: center;
-      }
 
-      .time-column {
-        font-size: 12px;
-
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        .clock-icon {
-          width: 2rem;
-          height: 2rem;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: #4a5568;
-        }
-      }
-
-      .day-column {
         .date-number {
           font-size: 14px;
           color: var(--color-primary);
@@ -54,51 +34,48 @@
       }
     }
 
-    .calendar-row {
+    .calendar-body {
       display: grid;
-      grid-template-columns: repeat(8, 1fr);
-      border-bottom: 1px solid #e2e8f0;
+      grid-template-columns: repeat(7, 1fr);
+      min-height: 300px;
 
-      .time-cell {
-        padding: 1.5rem 0.5rem;
+      .date-column {
         border-right: 1px solid #e2e8f0;
+        padding: 0.5rem;
         display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 12px;
-      }
+        flex-direction: column;
+        gap: 0.75rem;
 
-      .day-cell {
-        border-right: 1px solid #e2e8f0;
-        min-height: 6rem;
-        position: relative;
+        .no-classes {
+          font-size: 12px;
+          color: #718096;
+          text-align: center;
+          padding: 2rem 0;
+        }
 
         .class-item {
-          height: max-content;
-          text-align: left;
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          padding: 0.5rem;
+          border-radius: 4px;
+          padding: 0.75rem;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
           display: flex;
           flex-direction: column;
           gap: 4px;
 
-          &.blue {
-            background-color: #ebf4ff; // Light blue background
-            border-left: 4px solid #3182ce; // Blue border
+          &.bg-\[\#EAFBF3\] {
+            border-left: 4px solid #10b981; // Green border for theory
           }
 
-          &.gray {
-            background-color: #f7fafc; // Light gray background
-            border-left: 4px solid #718096; // Gray border
+          &.bg-\[\#EDFAFF\] {
+            border-left: 4px solid #3b82f6; // Blue border for practice
+          }
+
+          &.bg-\[\#FFEDED\] {
+            border-left: 4px solid #ef4444; // Red border for exam
           }
 
           .class-code {
             font-weight: bold;
-            font-size: 10px;
+            font-size: 11px;
           }
 
           .class-room,

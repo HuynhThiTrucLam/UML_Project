@@ -1,28 +1,35 @@
 import React, { useState } from "react";
 import "./Login.scss";
-import LoginImage from "../../assets/images/login.png"; // Assuming you have a login image in your assets
-import Logo from "../../assets/images/Logo-blue.png"; // Assuming you have a logo image in your assets
+import LoginImage from "../../assets/images/login.png";
+import Logo from "../../assets/images/Logo-blue.png";
 import Input from "../../components/Input/Input";
 import { Checkbox } from "../../components/ui/checkbox";
 import Button from "../../components/Button/Button";
-import GoogleIcon from "../../assets/images/google.png"; // Assuming you have a Google icon in your assets
-
-const mockuser = {
-  username: "admin",
-  password: "admin",
-};
+import { useAuth } from "../../store/AuthContext";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  const handleLogin = () => {
-    if (username === mockuser.username && password === mockuser.password) {
-      alert("Đăng nhập thành công");
-      // Redirect to the dashboard or another page
-      window.location.href = "/admin/dashboard"; // Replace with your actual dashboard route
-    } else {
-      alert("Tên đăng nhập hoặc mật khẩu không đúng");
+  // Get the page the user was trying to access before being redirected to login
+  const from = location.state?.from?.pathname || "/admin/dashboard";
+
+  const handleLogin = async () => {
+    try {
+      const success = await login(username, password);
+      if (success) {
+        // Navigate to the page the user was originally trying to access
+        navigate(from, { replace: true });
+      } else {
+        setError("Tên đăng nhập hoặc mật khẩu không đúng");
+      }
+    } catch (error) {
+      setError("Đã xảy ra lỗi khi đăng nhập");
     }
   };
 
@@ -38,6 +45,7 @@ const Login = () => {
             className="Login-input"
             onChange={(e) => {
               setUsername(e.target.value);
+              setError("");
             }}
           />
           <Input
@@ -47,8 +55,10 @@ const Login = () => {
             type="password"
             onChange={(e) => {
               setPassword(e.target.value);
+              setError("");
             }}
           />
+          {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
           <div className="flex items-center space-x-2">
             <Checkbox id="terms" />
             <label
@@ -59,14 +69,6 @@ const Login = () => {
             </label>
           </div>
           <Button text="Đăng nhập" isPrimary={true} onClick={handleLogin} />
-          <div className="Login-line">
-            <span>Hoặc đăng nhập với</span>
-          </div>
-
-          <div className="Login-another">
-            <img src={GoogleIcon} alt="" />
-            <span>Đăng nhập với tài khoản Google</span>
-          </div>
         </div>
         <div className="Login-image">
           <img src={LoginImage} alt="" />

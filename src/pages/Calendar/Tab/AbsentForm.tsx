@@ -80,6 +80,7 @@ const AbsentForm = () => {
         <div className="Calendar-absent-wrap">
           <div className="Calendar-absent-form">
             <Input
+              type="text"
               label="Mã học viên / Mã giáo viên"
               placeholder="VD: 123456"
               isForce={true}
@@ -89,37 +90,16 @@ const AbsentForm = () => {
             />
 
             <div className="Calendar-select">
-              <p>* Loại đơn</p>
               <Selection
+                title="* Chọn loại đơn"
                 placeholder={typeOfAbsent}
                 data={typeOfAbsentList}
                 setData={setTypeOfAbsent}
               ></Selection>
-              {/* <Select>
-                <SelectTrigger className="Calendar-select-container">
-                  <SelectValue placeholder={typeOfAbsent} />
-                </SelectTrigger>
-                <SelectContent className="Calendar-select-container">
-                  <SelectGroup>
-                    <SelectLabel>Chức vụ</SelectLabel>
-                    {typeOfAbsentList.map((item: any) => (
-                      <SelectItem
-                        key={item.id}
-                        value={item.name}
-                        onClick={() => {
-                          setTypeOfAbsent(item.name);
-                        }}
-                        className="text-[12px]"
-                      >
-                        {item.name}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select> */}
             </div>
 
             <Input
+              type="number"
               label="Số điện thoại"
               placeholder="VD: 0123456789"
               isForce={true}
@@ -129,6 +109,7 @@ const AbsentForm = () => {
             />
 
             <Input
+              type="email"
               label="Địa chỉ email"
               placeholder="VD: nguyenVanA@gmail.com"
               onChange={(e: any) => {

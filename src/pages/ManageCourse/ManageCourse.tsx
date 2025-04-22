@@ -25,7 +25,6 @@ const ManageCourse = () => {
           </TabsList>
         </div>
 
-        {/* <TabsContent value="approve-offline">*/}
         <TabsContent value="schedule">
           <ScheduleLearnTab />
         </TabsContent>

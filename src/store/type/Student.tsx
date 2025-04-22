@@ -19,21 +19,9 @@ export interface PersonalImgData {
   cardImgBack: string;
 }
 
-export interface ChooseDataType {
-  courseId: string;
-  healthCheckId: string;
-}
-
 export interface ChooseData {
   course: CourseType;
   healthCheck: HealthCheckType;
-}
-
-// Đây là data đưa cho BE
-export interface StudentType {
-  personalData: PersonalData; // Thông tin cá nhân
-  personalImgData: PersonalImgData; // Thông tin ảnh cá nhân
-  chooseData: ChooseDataType; // Thông tin lựa chọn
 }
 
 //Đây là data nhận về

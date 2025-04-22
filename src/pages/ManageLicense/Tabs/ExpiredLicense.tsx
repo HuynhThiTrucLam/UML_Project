@@ -10,9 +10,6 @@ const mockProfileData: Profile = {
   id: "reg001",
   method: "Online",
   registrationDate: "2025-03-01",
-  approvedDate: "",
-  rejectedDate: "",
-  registrationMethod: "Online",
   status: "pending",
   studentInfor: {
     personalData: {
@@ -23,6 +20,8 @@ const mockProfileData: Profile = {
       licenseType: "B1",
       email: "vana@gmail.com",
       healthCheckDocURL: "",
+      identityNumber: "123456789",
+      address: "123 Đường ABC, TP.HCM",
     },
     personalImgData: {
       avatar: "/avatars/a.png",
@@ -33,10 +32,7 @@ const mockProfileData: Profile = {
       course: {
         id: "course001",
         name: "Khóa học B1 - Sáng",
-        typeOfLicense: {
-          id: "B1",
-          name: "Giấy phép hạng B1",
-        },
+        licenseTypeId: "B1",
         examDate: "2025-05-20",
         startDate: "2025-04-30",
         endDate: "2025-05-30",
@@ -48,6 +44,7 @@ const mockProfileData: Profile = {
         name: "Khám sức khỏe tổng quát",
         date: "2025-06-15",
         address: "Bệnh viện ABC, Đường XYZ, TP.HCM",
+        courseId: "course001",
       },
     },
   },

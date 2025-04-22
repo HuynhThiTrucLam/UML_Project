@@ -1,4 +1,3 @@
-import { typeOfLicense } from "../../../components/Form/Features/PersonalInforForm";
 import Selection from "../../../components/Select/Select";
 import { Card, CardContent } from "../../../components/ui/card";
 import { TabsContent } from "../../../components/ui/tabs";
@@ -24,7 +23,7 @@ const ApproveLicense = () => {
                 <Selection
                   title="Lọc theo Hạng bằng lái"
                   lable="Lọc theo hạng bằng lái"
-                  data={typeOfLicense}
+                  data={[]}
                   placeholder="Chọn hạng bằng lái"
                   setData={() => {}}
 

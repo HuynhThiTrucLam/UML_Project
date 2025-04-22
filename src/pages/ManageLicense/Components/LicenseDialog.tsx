@@ -1,6 +1,5 @@
 import { useState } from "react";
 import Button from "../../../components/Button/Button";
-import { typeOfLicense } from "../../../components/Form/Features/PersonalInforForm";
 import Input from "../../../components/Input/Input";
 import Selection from "../../../components/Select/Select";
 import {
@@ -21,15 +20,15 @@ interface LicenseDialogProps {
 }
 
 const useLicenseForm = (initialData?: License) => {
-  const [licenseCode, setLicenseCode] = useState(initialData?.code || "");
+  const [licenseCode, setLicenseCode] = useState(initialData?.id || "");
   const [licenseType, setLicenseType] = useState<string>(
     initialData?.typeOfLicense?.id?.toString() || ""
   );
   const [issueDate, setIssueDate] = useState(
-    initialData?.issueDate?.split("T")[0] || ""
+    initialData?.releaseDate?.split("T")[0] || ""
   );
   const [expiryDate, setExpiryDate] = useState(
-    initialData?.expiryDate?.split("T")[0] || ""
+    initialData?.expiredDate?.split("T")[0] || ""
   );
 
   const handleSetType = (value: any) => {
@@ -45,8 +44,8 @@ const useLicenseForm = (initialData?: License) => {
     return (
       licenseCode !== initialData.id ||
       licenseType !== initialData.typeOfLicense.id ||
-      issueDate !== initialData.issueDate.split("T")[0] ||
-      expiryDate !== initialData.expiryDate.split("T")[0]
+      issueDate !== initialData.releaseDate.split("T")[0] ||
+      expiryDate !== initialData.expiredDate.split("T")[0]
     );
   };
 
@@ -112,7 +111,7 @@ const LicenseDialog = ({ mode, initialData }: LicenseDialogProps) => {
             <AlertDialogTitle>
               {mode === "add"
                 ? "Điền thông tin giấy phép"
-                : `Chỉnh sửa giấy phép ${initialData?.code}`}
+                : `Chỉnh sửa giấy phép ${initialData?.id}`}
             </AlertDialogTitle>
           </AlertDialogHeader>
 
@@ -127,7 +126,7 @@ const LicenseDialog = ({ mode, initialData }: LicenseDialogProps) => {
             <div className="ManageLicense-select">
               <p>Loại bằng lái</p>
               <Selection
-                data={typeOfLicense}
+                data={[]}
                 placeholder="Chọn loại bằng"
                 setData={setters.setLicenseType}
                 value={fields.licenseType}

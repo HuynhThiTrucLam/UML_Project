@@ -13,6 +13,7 @@ import {
   TableRow,
 } from "../../../components/ui/table";
 import { License } from "../../../store/type/Lincense";
+import axios from "axios";
 
 const mockLicenses: License[] = [
   {
@@ -56,6 +57,39 @@ const mockLicenses: License[] = [
 const LicenseTable = () => {
   console.log("Filter");
   const [licenses, setLicenses] = useState<License[]>([]);
+
+  const retriveLicenses = async () => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/license_type/?skip=0&limit=100`
+      );
+      const data = response.data.items;
+
+      // {
+      //   "type_name": "Hạng bằng lái A1",
+      //   "age_requirement": "Đủ 18 tuổi trở lên",
+      //   "health_requirements": "Để đủ điều kiện tham gia kỳ thi sát hạch cấp giấy phép lái xe hạng A1 (dành cho xe mô tô hai bánh có dung tích xi-lanh dưới 175 cm³), người dự thi bắt buộc phải đáp ứng các tiêu chuẩn sức khỏe theo quy định hiện hành của Bộ Y tế và Bộ Giao thông Vận tải. Việc kiểm tra sức khỏe này nhằm đảm bảo người lái xe có đủ khả năng về thể chất và tinh thần để điều khiển phương tiện một cách an toàn, không gây nguy hiểm cho bản thân và những người tham gia giao thông khác. Các yêu cầu chính bao gồm tình trạng ổn định về tâm thần kinh (không mắc các bệnh tâm thần cấp tính, động kinh, hoặc các rối loạn có thể ảnh hưởng đến khả năng kiểm soát hành vi), thị lực đảm bảo (đạt mức tối thiểu theo quy định, kể cả khi sử dụng kính điều chỉnh), chức năng vận động của tay, chân đủ để thực hiện các thao tác điều khiển xe (tay lái, phanh, ga...), không bị các dị tật hoặc bệnh lý nghiêm trọng về tim mạch, hô hấp có thể gây ra tình trạng mất kiểm soát đột ngột khi đang lái xe. Ngoài ra, người lái xe không được nghiện các chất kích thích, ma túy. Việc khám sức khỏe phải được thực hiện tại các cơ sở y tế được cấp phép và kết quả khám (Giấy khám sức khỏe dành cho người lái xe) còn hiệu lực là một phần hồ sơ bắt buộc khi đăng ký dự thi bằng lái A1.",
+      //   "training_duration": 2,
+      //   "fee": 1699000,
+      //   "id": "2533a434-35c7-47fa-9306-8e45da5ec3b4"
+      // },
+      const licenses = data.map((license: any) => ({
+        id: license.id,
+        typeOfLicense: {
+          id: license.id,
+          name: license.type_name,
+        },
+        studentId: license.studentId,
+        releaseDate: license.releaseDate,
+        endDate: license.endDate,
+        expiredDate: license.expiredDate,
+        status: license.status,
+      }));
+      setLicenses(licenses);
+    } catch (error) {
+      console.error("Error fetching licenses:", error);
+    }
+  };
 
   useEffect(() => {
     //Call API to get license List

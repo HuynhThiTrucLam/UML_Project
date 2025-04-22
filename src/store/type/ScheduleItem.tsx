@@ -1,9 +1,10 @@
+import { LicenseType } from "./Lincense";
+
 export interface ScheduleType {
   id: string;
   courseId: string;
-  typeOfLicense: string; // Loại khóa học
+  typeOfLicense: LicenseType; // Loại khóa học
   type: string; // "LyThuyet" | "ThucHanh" || "Thi"
-  date: string;
   startTime: string;
   endTime: string;
   location: string;

@@ -43,7 +43,7 @@ const ProfileTable = ({ profileData, isAdmin }: ProfileTableProps) => {
         <TableBody>
           <TableRow className="border border-gray-200">
             <TableCell className="font-medium border border-gray-200 text-center">
-              {profileData.id}
+              {profileData.id.split("-")[1]}
             </TableCell>
             <TableCell
               className={`File-table-content border-b border-gray-200 text-center ${
@@ -102,9 +102,7 @@ const ProfileTable = ({ profileData, isAdmin }: ProfileTableProps) => {
                 <div className="flex gap-[8px]">
                   <p className="title">Loại bằng lái: </p>
                   <p>
-                    {String(
-                      profileData.studentInfor.chooseData.course.typeOfLicense
-                    )}
+                    {String(profileData.scheduleInfor[0]?.typeOfLicense?.name)}
                   </p>
                 </div>
 
@@ -129,8 +127,6 @@ const ProfileTable = ({ profileData, isAdmin }: ProfileTableProps) => {
                           .map((schedule) => (
                             <div key={schedule.id}>
                               {schedule.startTime} - {schedule.endTime}
-                              {" ngày "}
-                              {schedule.date}
                               {" tại "}
                               {schedule.location}
                             </div>
@@ -145,8 +141,6 @@ const ProfileTable = ({ profileData, isAdmin }: ProfileTableProps) => {
                           .map((schedule) => (
                             <div key={schedule.id}>
                               {schedule.startTime} - {schedule.endTime}
-                              {" ngày "}
-                              {schedule.date}
                               {" tại "}
                               {schedule.location}
                             </div>
@@ -184,7 +178,13 @@ const ProfileTable = ({ profileData, isAdmin }: ProfileTableProps) => {
               </div>
             </TableCell>
             <TableCell className="border border-gray-200 text-center">
-              <div className="File-table-status">{profileData.status}</div>
+              <div className="File-table-status">
+                {profileData.status === "pending"
+                  ? "Đang chờ duyệt"
+                  : profileData.status === "approved"
+                  ? "Đã duyệt và chờ thanh toán"
+                  : " Hoàn tất hồ sơ"}
+              </div>
             </TableCell>
           </TableRow>
         </TableBody>

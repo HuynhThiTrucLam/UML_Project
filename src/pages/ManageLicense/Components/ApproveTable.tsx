@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "../../../components/ui/table";
-import { mockRegistrations } from "../../../store/type/Profile";
+// import { mockRegistrations } from "../../../store/type/Profile";
 import RegisterateDetail from "../../AdminDashboard/Detail/RegisterateDetail";
 
 const ApproveTable = () => {
@@ -50,7 +50,7 @@ const ApproveTable = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {mockRegistrations.map((license) => (
+              {/* {mockRegistrations.map((license) => (
                 <TableRow key={license.id} className="border">
                   <TableCell className="text-center border">
                     {license.id}
@@ -113,7 +113,7 @@ const ApproveTable = () => {
                     Không có khoá học nào phù hợp.
                   </TableCell>
                 </TableRow>
-              )}
+              )} */}
             </TableBody>
           </Table>
         </CardContent>

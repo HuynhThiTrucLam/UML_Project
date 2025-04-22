@@ -41,43 +41,42 @@ const ScheduleItem: React.FC<ClassScheduleCalendarProps> = ({
   }, [selectedDate]);
 
   // Format the time from 24-hour format
-  const formatTime = (hour: number): string => {
-    return `${hour}:00`;
+  const formatTime = (time: Date): string => {
+    return `${time.getHours()}:${time
+      .getMinutes()
+      .toString()
+      .padStart(2, "0")}`;
   };
 
-  // Generate array of hours from 8 to 15 (8 AM to 3 PM)
-  const hours: number[] = Array.from({ length: 8 }, (_, i) => i + 8);
+  // Get classes for a specific date
+  const getClassesForDate = (date: Date): ScheduleType[] => {
+    return scheduleData
+      .filter((item) => {
+        // Parse the startTime from string to Date object
+        const classDate = new Date(item.startTime);
 
-  // Check if a class is scheduled at a specific date and hour
-  const getClassForDateAndHour = (
-    date: Date,
-    hour: number
-  ): ScheduleType | undefined => {
-    // console.info("scheduleData: ", scheduleData);
-    const result = scheduleData.find((item) => {
-      const classDate = new Date(item.date);
-      return (
-        classDate.getDate() === date.getDate() &&
-        classDate.getMonth() === date.getMonth() &&
-        classDate.getFullYear() === date.getFullYear() &&
-        parseInt(item.startTime.split(":")[0]) === hour
-      );
-    });
-    // console.info("result: ", result);
-    return result;
+        // Compare date components
+        return (
+          classDate.getDate() === date.getDate() &&
+          classDate.getMonth() === date.getMonth() &&
+          classDate.getFullYear() === date.getFullYear()
+        );
+      })
+      .sort((a, b) => {
+        // Sort by start time
+        return (
+          new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
+        );
+      });
   };
 
-  // Get color class based on class code
-  const getColorClass = (licenseTypeId: string): string => {
-    switch (licenseTypeId) {
-      case "1":
+  // Get color class based on class type
+  const getColorClass = (type: string): string => {
+    switch (type) {
+      case "theory":
         return "bg-[#EAFBF3]";
-      case "2":
+      case "practice":
         return "bg-[#EDFAFF]";
-      case "3":
-        return "bg-[#FEF3D5]";
-      case "4":
-        return "bg-[#DFF0FF]";
       default:
         return "bg-[#FFEDED]";
     }
@@ -88,38 +87,25 @@ const ScheduleItem: React.FC<ClassScheduleCalendarProps> = ({
       <div className="schedule-container">
         {/* Calendar Header */}
         <div className="calendar-header">
-          <div className="time-column">
-            <div className="clock-icon">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <circle cx="12" cy="12" r="10" />
-                <polyline points="12 6 12 12 16 14" />
-              </svg>
-            </div>
-          </div>
-
           {weekDates.map((date, index) => (
             <div key={index} className="day-column">
               <div className="date-number">{date.getDate()}</div>
               <div className="day-name">
                 {
                   [
-                    "Monday",
-                    "Tuesday",
-                    "Wednesday",
-                    "Thursday",
-                    "Friday",
-                    "Saturday",
-                    "Sunday",
+                    "Thứ hai",
+                    "Thứ ba",
+                    "Thứ tư",
+                    "Thứ năm",
+                    "Thứ sáu",
+                    "Thứ bảy",
+                    "Chủ nhật",
+                    // "Tuesday",
+                    // "Wednesday",
+                    // "Thursday",
+                    // "Friday",
+                    // "Saturday",
+                    // "Sunday",
                   ][index]
                 }
               </div>
@@ -128,35 +114,42 @@ const ScheduleItem: React.FC<ClassScheduleCalendarProps> = ({
         </div>
 
         {/* Calendar Body */}
-        {hours.map((hour) => (
-          <div key={hour} className="calendar-row">
-            <div className="time-cell">{formatTime(hour)}</div>
+        <div className="calendar-body">
+          {weekDates.map((date, dateIndex) => {
+            const classesForDate = getClassesForDate(date);
 
-            {weekDates.map((date, dateIndex) => {
-              const classItem = getClassForDateAndHour(date, hour);
-
-              return (
-                <div key={dateIndex} className="day-cell">
-                  {classItem && (
+            return (
+              <div key={dateIndex} className="date-column">
+                {classesForDate.length === 0 ? (
+                  <div className="no-classes">Không có lớp học nào</div>
+                ) : (
+                  classesForDate.map((classItem, classIndex) => (
                     <div
-                      className={`class-item ${getColorClass(
-                        classItem.courseId
-                      )}`}
+                      key={classIndex}
+                      className={`class-item ${getColorClass(classItem.type)}`}
                     >
-                      <div className="class-code">{classItem.courseId}</div>
+                      <div className="class-code">
+                        {classItem.courseId.split("-")[1]}
+                      </div>
+                      <div className="class-time">
+                        Thời gian: {formatTime(new Date(classItem.startTime))}-{" "}
+                        {formatTime(new Date(classItem.endTime))}
+                      </div>
                       <div className="class-room">
                         Địa điểm: {classItem.location}
                       </div>
-                      <div className="class-time">
-                        Thời gian: {classItem.startTime} - {classItem.endTime}
+                      <div className="student-count">
+                        Hạng bằng lái: {classItem.typeOfLicense.name}
                       </div>
                       <div className="student-count">
-                        Hạng bằng lái: {classItem.typeOfLicense}
+                        Hình thức:{" "}
+                        {classItem.type === "theory"
+                          ? "Lý thuyết"
+                          : classItem.type === "practice"
+                          ? "Thực hành"
+                          : "Thi"}
                       </div>
-                      <div className="student-count">
-                        Hình thức: {classItem.type}
-                      </div>
-                      {isCourse && (
+                      {isCourse && classItem.teacher && (
                         <div className="teacher-info">
                           <div className="teacher-avatar">
                             <svg
@@ -175,17 +168,17 @@ const ScheduleItem: React.FC<ClassScheduleCalendarProps> = ({
                             </svg>
                           </div>
                           <span className="teacher-name">
-                            {classItem.teacher}
+                            {classItem.teacher || "Chưa có thông tin"}
                           </span>
                         </div>
                       )}
                     </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        ))}
+                  ))
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

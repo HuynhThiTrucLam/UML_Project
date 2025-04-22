@@ -33,7 +33,6 @@ const Form = () => {
   });
 
   const handlePersonalDataChange = (newData: Partial<PersonalData>) => {
-    console.log("newData", newData);
     setPersonalData((prev) => {
       if (prev) {
         return {
@@ -55,7 +54,6 @@ const Form = () => {
     });
   };
   const handlePersonalImgDataChange = (newData: Partial<any>) => {
-    console.log("newData", newData);
     setPersonalImgData((prev) => ({
       ...prev,
       ...newData,
@@ -112,43 +110,42 @@ const Form = () => {
 
   const handleSummit = async () => {
     try {
-      // var studentInformation = {
-      //   identity_number: personalData?.identityNumber,
-      //   full_name: personalData?.name,
-      //   gender: personalData?.gender,
-      //   phone_number: personalData?.phone,
-      //   date_of_birth: personalData?.birthDate.split("/").reverse().join("-"),
-      //   address: personalData?.address,
-      //   email: personalData?.email,
-      //   license_type_id: personalData?.licenseType,
-      //   identity_image_front: personalImgData.cardImgFront,
-      //   identity_image_back: personalImgData.cardImgBack,
-      //   avatar: personalImgData.avatar,
-      //   course_id: chooseData.courseId,
-      //   health_check_schedule_id: chooseData.healthCheckId,
-      //   role: "user",
-      // };
-      // console.log("studentInformation", studentInformation);
-      // const response = await axios.post(
-      //   import.meta.env.VITE_API_URL + "/api/course_registration/",
-      //   studentInformation,
-      //   {
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //     },
-      //   }
-      // );
-      // if (response.status === 201) {
-      //   alert("Đăng ký thành công!");
-      //   window.location.reload();
-      // } else {
-      //   alert("Đã xảy ra lỗi trong quá trình gửi thông tin. Vui lòng thử lại.");
-      // }
-      toast.success("Đăng ký thành công!", {
-        description: "Vui lòng kiểm tra email để biết thêm thông tin chi tiết.",
-        duration: 500000,
-        className: "[&>[data-icon]]:!text-green-500",
-      });
+      var studentInformation = {
+        identity_number: personalData?.identityNumber,
+        full_name: personalData?.name,
+        gender: personalData?.gender,
+        phone_number: personalData?.phone,
+        date_of_birth: personalData?.birthDate.split("/").reverse().join("-"),
+        address: personalData?.address,
+        email: personalData?.email,
+        license_type_id: personalData?.licenseType,
+        identity_image_front: personalImgData.cardImgFront,
+        identity_image_back: personalImgData.cardImgBack,
+        avatar: personalImgData.avatar,
+        course_id: chooseData.courseId,
+        health_check_schedule_id: chooseData.healthCheckId,
+        role: "user",
+      };
+      console.log("studentInformation", studentInformation);
+      const response = await axios.post(
+        import.meta.env.VITE_API_URL + "/api/course_registration/",
+        studentInformation,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (response.status === 201) {
+        toast.success("Đăng ký thành công!", {
+          description:
+            "Vui lòng kiểm tra email để biết thêm thông tin chi tiết.",
+          duration: 5000,
+          className: "[&>[data-icon]]:!text-green-500",
+        });
+      } else {
+        alert("Đã xảy ra lỗi trong quá trình gửi thông tin. Vui lòng thử lại.");
+      }
     } catch (error) {
       console.error("Error submitting form:", error);
       alert("Đã xảy ra lỗi trong quá trình gửi thông tin. Vui lòng thử lại.");

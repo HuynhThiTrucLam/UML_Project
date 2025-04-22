@@ -5,15 +5,6 @@ import { LicenseType } from "../../../store/type/Lincense";
 import { PersonalData } from "../../../store/type/Student";
 import Selection from "../../Select/Select";
 
-export const typeOfLicense: LicenseType[] = [
-  { id: "0", name: "Tất cả" },
-  { id: "1", name: "Bằng lái A1" },
-  { id: "2", name: "Bằng lái A2" },
-  { id: "3", name: "Bằng lái B1" },
-  { id: "4", name: "Bằng lái B2" },
-  { id: "5", name: "Bằng lái C" },
-];
-
 export const mockGender = [
   { id: "1", name: "Nam" },
   { id: "2", name: "Nữ" },
@@ -53,7 +44,7 @@ const PersonalInforForm: React.FC<PersonalInforFormProps> = ({
         name: item.type_name,
       }));
       setLicenseTypeList(licenseTypes);
-      console.info(licenseTypes);
+      // console.info(licenseTypes);
       setLicenseType(licenseTypes[0].id);
       setIsLoading(false);
     } catch (error) {
@@ -119,7 +110,7 @@ const PersonalInforForm: React.FC<PersonalInforFormProps> = ({
           isForce={true}
         />
         <Input
-          label="Năm sinh"
+          label="Ngày tháng năm sinh"
           placeholder="DD/MM/YYYY"
           value={formData?.birthDate}
           onChange={(e) => handleChange("birthDate", e.target.value)}
@@ -127,6 +118,7 @@ const PersonalInforForm: React.FC<PersonalInforFormProps> = ({
         />
         <Input
           label="Số điện thoại"
+          type="number"
           placeholder="VD: 0123456789"
           value={formData?.phone}
           onChange={(e) => handleChange("phone", e.target.value)}
