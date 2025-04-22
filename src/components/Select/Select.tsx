@@ -15,7 +15,7 @@ interface SelectionProps {
   data: any;
   setData: (data: any) => void;
   lable?: string;
-  title?: string;
+  title?: string | null;
 }
 
 const Selection = ({
@@ -35,9 +35,11 @@ const Selection = ({
 
   return (
     <div className="Selection">
-      <p className="text-[12px] text-primary font-semibold">
-        {title ? title : "Lọc bằng hạng bằng lái"}
-      </p>
+      {title != null && (
+        <p className="text-[12px] text-primary font-semibold">
+          {title ? title : "Lọc bằng hạng bằng lái"}
+        </p>
+      )}
       <Select onValueChange={handleValueChange}>
         <SelectTrigger className="Selection-header">
           <SelectValue

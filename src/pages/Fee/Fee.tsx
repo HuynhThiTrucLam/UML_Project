@@ -1,35 +1,135 @@
-import { useState } from "react";
+import axios from "axios";
+import { FileIcon } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import PhoneIcon from "../../assets/icons/PhoneIcon.tsx";
-import Button from "../../components/Button/Button";
-import "./Fee.scss";
 import QR from "../../assets/images/QR.png";
 import blur from "../../assets/images/alias.png";
+import Button from "../../components/Button/Button";
 import Input from "../../components/Input/Input";
-import { FileIcon } from "lucide-react";
+import Selection from "../../components/Select/Select.tsx";
+import { PaymentMethod } from "../../store/type/PaymentMethod.tsx";
+import "./Fee.scss";
+import { set } from "date-fns";
 
 const Fee = () => {
   const [identityCode, setIdentityCode] = useState<string>("");
-  const [phoneNumber, setPhoneNumber] = useState<string>("");
+  const [isProfileIdValid, setIsProfileIdValid] = useState<boolean>(true);
+  const [profileData, setProfileData] = useState<string | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const [profileId, setProfileId] = useState<string>("");
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<
+    string | null
+  >(null);
   const [evidence, setEVidence] = useState<string>("");
 
-  const handleSearchProfile = () => {
-    //Goij API lay profile by phone number
+  const [submissionError, setSubmissionError] = useState<string | null>(null);
 
-    console.log("Laay profile code theo so dien thoai");
+  const handleCopyProfileId = () => {
+    if (profileData) {
+      navigator.clipboard.writeText(profileData);
+      alert("Đã sao chép mã hồ sơ!");
+    }
   };
-  const handleSubmitEvidence = () => {
-    if (!identityCode) {
-      alert("Vui lòng nhập mã hồ sơ");
-      return;
-    }
-    if (!evidence) {
-      alert("Vui lòng tải lên minh chứng thanh toán");
-      return;
-    }
 
-    //Goi API submit evidence
-    console.log("Submit evidence");
+  // Check if profileId exists in data
+  const handleCheckProfileId = async () => {
+    try {
+      const response = await axios.get(
+        import.meta.env.VITE_API_URL +
+          `/api/course_registration/identity_number/${identityCode}/`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        const data = response.data;
+        // console.log(data);
+
+        const profileData = {
+          id: data.id,
+        };
+        // console.info(profileData);
+        setProfileData(profileData.id);
+        setIsProfileIdValid(true);
+      } else {
+        setIsProfileIdValid(false);
+      }
+    } catch (error) {
+      console.error("Error fetching profile data:", error);
+      setIsProfileIdValid(false);
+    }
   };
+
+  const handleSubmitFee = async () => {
+    setIsLoading(true);
+
+    try {
+      var paymentCreate = {
+        payment_method_id: selectedPaymentMethod,
+        evidence: evidence,
+        course_registration_id: profileId,
+      };
+
+      console.log("paymentCreate", paymentCreate);
+
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/payments/`,
+        paymentCreate,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.status === 200 || response.status === 201) {
+        toast.success("Nộp học phí thành công!", {
+          description:
+            "Vui lòng kiểm tra email để biết thêm thông tin chi tiết.",
+          duration: 6000,
+          className: "[&>[data-icon]]:!text-green-500",
+        });
+        setIsLoading(false);
+      } else {
+        setSubmissionError(
+          "Có lỗi xảy ra khi gửi thông tin. Vui lòng thử lại sau."
+        );
+      }
+    } catch (error) {
+      console.error("Error submitting payment:", error);
+      setSubmissionError(
+        "Không thể gửi thông tin thanh toán. Vui lòng thử lại sau."
+      );
+    }
+  };
+
+  const getPaymentMethod = async () => {
+    try {
+      const response = await fetch(
+        import.meta.env.VITE_API_URL +
+          "/api/payment_method/payment-methods/?skip=0&limit=100"
+      );
+      const data = await response.json();
+      console.log(data);
+      const paymentMethods = data.payment_methods.map((item: any) => ({
+        id: item.id,
+        name: item.method,
+      }));
+      setPaymentMethod(paymentMethods);
+    } catch (error) {
+      console.error("Error fetching payment methods:", error);
+    }
+  };
+
+  useEffect(() => {
+    getPaymentMethod();
+  }, []);
 
   return (
     <div className="Fee">
@@ -47,30 +147,60 @@ const Fee = () => {
             only five centuries, but also the leap into electronic typesetting,
             remaining essentially unchanged.
           </p>
-          <div className="Fee-search">
-            <div className=" w-full flex flex-row justify-between items-start gap-[1rem]">
-              <Input
-                placeholder="Nhập số số CCCD/CMND đã dùng để đăng ký hồ sơ tại đây"
-                isForce={true}
-                onChange={(e) => setIdentityCode(e.target.value)}
-                className="w-full"
-                value={identityCode}
-              ></Input>
-              <Input
-                placeholder="Nhập số điện thoại dùng để nhận lại mã hồ sơ tại đây"
-                isForce={true}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                className="w-full"
-                value={phoneNumber}
-              ></Input>
+          <div className="flex flex-col gap-[1rem]">
+            <div className="Fee-search">
+              <div className=" w-full flex flex-row justify-between items-start gap-[1rem]">
+                <Input
+                  type="text"
+                  placeholder="Nhập số CCCD/CMND/Hộ chiếu"
+                  isForce={true}
+                  value={identityCode}
+                  onChange={(e) => setIdentityCode(e.target.value)}
+                  className="w-full"
+                />
+              </div>
+              <Button
+                text="TRA CỨU NGAY"
+                isPrimary={true}
+                onClick={handleCheckProfileId}
+              />
             </div>
-            <Button
-              text="TRA CỨU NGAY"
-              isPrimary={true}
-              onClick={handleSearchProfile}
-            />
+            {!isProfileIdValid && (
+              <p className="error text-red-500 font-light text-[12px]">
+                * Mã hồ sơ không tồn tại.
+              </p>
+            )}
+            {profileData && (
+              <div className="flex gap-3 items-center ">
+                <p className="title text-[12px] font-semibold">
+                  Mã hồ sơ của bạn là:{" "}
+                  <span className="font-light">{profileData}</span>
+                </p>
+                <div
+                  className="flex items-center gap-2 bg-[#F5F5F5] p-2 rounded-[8px] cursor-pointer hover:bg-blue-200 transition-colors duration-200"
+                  onClick={handleCopyProfileId}
+                >
+                  <p className="text-[12px]">Sao chép mã</p>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="1"
+                    stroke="currentColor"
+                    className="size-5"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75"
+                    />
+                  </svg>
+                </div>
+              </div>
+            )}
           </div>
         </div>
+
         <div className="Fee-action">
           <div className="Fee-instruction">
             <h3>Hướng dẫn nộp lệ phí thi</h3>
@@ -166,13 +296,21 @@ const Fee = () => {
             <h3>Biểu mẫu xác nhận hoàn thành lệ phí</h3>
             <div className="Fee-instruction-container">
               <Input
+                type="text"
                 placeholder="VD: ABC"
                 isForce={true}
                 label="Mã hồ sơ"
-                onChange={() => {}}
+                onChange={(e) => setProfileId(e.target.value)}
                 className="w-full"
-                value={identityCode}
+                value={profileId}
               ></Input>
+              <Selection
+                title="Chọn hình thức thanh toán"
+                placeholder={"Vui lòng chọn hình thức thanh toán"}
+                data={paymentMethod}
+                setData={setSelectedPaymentMethod}
+                value={selectedPaymentMethod}
+              ></Selection>
               <div className="Fee-upload">
                 <p>* Tải lên minh chứng nộp học phí</p>
                 <div className="Form-upload-import">
@@ -191,10 +329,16 @@ const Fee = () => {
                   <span>Kích thước tối đa: 20MB</span>
                 </div>
               </div>
+              {submissionError && (
+                <p className="error text-red-500 font-light text-[12px]">
+                  {submissionError}
+                </p>
+              )}
+
               <Button
-                text="NỘP MINH CHỨNG XÁC NHẬN"
+                text={isLoading ? "ĐANG XỬ LÝ..." : "NỘP MINH CHỨNG XÁC NHẬN"}
                 isPrimary={true}
-                onClick={handleSubmitEvidence}
+                onClick={handleSubmitFee}
               />
             </div>
           </div>

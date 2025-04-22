@@ -72,14 +72,6 @@ const ProfileOfflineList = () => {
     setOnlineRegistrations(filtered);
   };
 
-  const handleFilterByLicenseType = () => {
-    console.log("Đã lọc hồ sơ theo loại giấy phép");
-    const filtered = onlineRegistrations.filter(
-      (item) => item.studentInfor.personalData.licenseType === licenseType?.name
-    );
-    setOnlineRegistrations(filtered);
-  };
-
   const getTypeOfLicense = async () => {
     try {
       const response = await axios.get(
@@ -90,7 +82,15 @@ const ProfileOfflineList = () => {
         name: item.type_name,
       }));
       // return licenseTypes;
-      setTypeOfLicenses(licenseTypes);
+      const data = [
+        {
+          id: "all",
+          name: "Tất cả",
+        },
+        ...licenseTypes,
+      ];
+      setTypeOfLicenses(data);
+      setLicenseType(data[0]);
     } catch (error) {
       console.error("Error fetching license types:", error);
       return [];
@@ -132,6 +132,20 @@ const ProfileOfflineList = () => {
     setSearchResults(filtered);
   }, [searchValue, onlineRegistrations]);
 
+  const handleSelectLicenseType = (selected: string) => {
+    const typeOfLicense = typeOfLicenses.find((item) => item.id === selected);
+    if (!typeOfLicense) return;
+    setLicenseType(typeOfLicense);
+    if (typeOfLicense.id === "all") {
+      setSearchResults(onlineRegistrations);
+      return;
+    }
+    const filtered = onlineRegistrations.filter(
+      (item) =>
+        item.studentInfor.personalData.licenseType === typeOfLicense?.name
+    );
+    setSearchResults(filtered);
+  };
   return (
     <div className="ManageProfile-approve">
       <TabsContent value="approve-offline">
@@ -147,12 +161,10 @@ const ProfileOfflineList = () => {
               </div>
               <div className="ManageProfile-type">
                 <Selection
-                  placeholder={licenseType?.name}
+                  placeholder={"Vui lòng chọn loại bằng lái"}
                   data={typeOfLicenses}
-                  setData={(type) => {
-                    setLicenseType(type);
-                    handleFilterByLicenseType();
-                  }}
+                  setData={handleSelectLicenseType}
+                  value={licenseType?.id}
                 ></Selection>
               </div>
             </div>

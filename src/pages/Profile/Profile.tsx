@@ -8,83 +8,6 @@ import { Profile } from "../../store/type/Profile.tsx";
 import ProfileTable from "./Table.tsx";
 import axios from "axios";
 
-// const mockProfileData: Profile = {
-//   id: "reg001",
-//   method: "Online",
-//   registrationDate: "2025-03-01",
-//   approvedDate: "",
-//   rejectedDate: "",
-//   registrationMethod: "Online",
-//   status: "pending",
-//   studentInfor: {
-//     personalData: {
-//       name: "Nguyễn Văn A",
-//       phone: "0909123456",
-//       gender: "Nam",
-//       birthDate: "2000-01-15",
-//       licenseType: "B1",
-//       email: "vana@gmail.com",
-//       healthCheckDocURL: "",
-//     },
-//     personalImgData: {
-//       avatar: "/avatars/a.png",
-//       cardImgFront: "/cards/front_a.png",
-//       cardImgBack: "/cards/back_a.png",
-//     },
-//     chooseData: {
-//       course: {
-//         id: "course001",
-//         name: "Khóa học B1 - Sáng",
-//         typeOfLicense: {
-//           id: "B1",
-//           name: "Giấy phép hạng B1",
-//         },
-//         examDate: "2025-05-20",
-//         startDate: "2025-04-30",
-//         endDate: "2025-05-30",
-//         registeredCount: 15,
-//         maxStudents: 30,
-//       },
-//       healthCheck: {
-//         id: "1",
-//         name: "Khám sức khỏe tổng quát",
-//         date: "2025-06-15",
-//         address: "Bệnh viện ABC, Đường XYZ, TP.HCM",
-//       },
-//     },
-//   },
-//   scheduleInfor: [
-//     {
-//       id: "schedule001",
-//       courseId: "course001",
-//       type: "LyThuyet",
-//       date: "2025-04-30",
-//       startTime: "08:00",
-//       endTime: "10:00",
-//       location: "Phòng học A1",
-//       teacher: "Nguyễn Văn T",
-//     },
-//     {
-//       id: "schedule002",
-//       courseId: "course001",
-//       type: "ThucHanh",
-//       date: "2025-05-02",
-//       startTime: "08:00",
-//       endTime: "10:00",
-//       location: "Phòng học A1",
-//       teacher: "Nguyễn Văn T",
-//     },
-//   ],
-//   scoreOverall: "",
-//   receiveDate: "",
-//   location: "",
-// };
-
-// const mockOTP = {
-//   profileId: "reg001",
-//   otpCode: "1234",
-// };
-
 const File = () => {
   const [profileId, setProfileId] = useState<string>("");
   const [profileData, setProfileData] = useState<Profile | null>(null);
@@ -107,7 +30,7 @@ const File = () => {
         const data = response.data;
         // console.log(data);
 
-        const profileData = {
+        const profileData: Profile = {
           id: data.id,
           method: data.method,
           registrationDate: data.registration_date,
@@ -133,7 +56,10 @@ const File = () => {
               course: {
                 id: data.course.id,
                 name: data.course.course_name,
-                licenseTypeId: data.course.license_type_id,
+                licenseType: {
+                  id: data.course.license_type_id,
+                  type_name: data.course.license_type.name, // Tên loại khóa học
+                },
                 examDate: "2025-05-20",
                 startDate: data.course.start_date,
                 endDate: data.course.end_date,
@@ -153,9 +79,8 @@ const File = () => {
             {
               id: "schedule001",
               courseId: "course001",
-              typeOfLicense: "B1",
+              typeOfLicense: { id: "B1", name: "B1" },
               type: "LyThuyet",
-              date: "2025-04-30",
               startTime: "08:00",
               endTime: "10:00",
               location: "Phòng học A1",
@@ -164,9 +89,8 @@ const File = () => {
             {
               id: "schedule002",
               courseId: "course001",
-              typeOfLicense: "B1",
+              typeOfLicense: { id: "B1", name: "B1" },
               type: "ThucHanh",
-              date: "2025-05-02",
               startTime: "08:00",
               endTime: "10:00",
               location: "Phòng học A1",
@@ -177,7 +101,7 @@ const File = () => {
           receiveDate: "",
           location: "",
         };
-        console.info(profileData);
+        // console.info(profileData);
         setProfileData(profileData);
         setIsProfileIdValid(true);
       } else {
@@ -208,6 +132,8 @@ const File = () => {
           <div className="File-search">
             <div className=" w-full flex flex-col gap-2">
               <Input
+                value={profileId}
+                type="text"
                 placeholder="Nhập số CCCD/CMND/Hộ chiếu"
                 isForce={true}
                 onChange={(e) => setProfileId(e.target.value)}

@@ -94,7 +94,9 @@ const ProfileList = () => {
         name: item.type_name,
       }));
       // return licenseTypes;
-      setTypeOfLicenses(licenseTypes);
+      const data = [{ id: "all", name: "Tất cả" }, ...licenseTypes];
+      setTypeOfLicenses(data);
+      setLicenseType(data[0]);
     } catch (error) {
       console.error("Error fetching license types:", error);
       return [];
@@ -136,6 +138,21 @@ const ProfileList = () => {
   const onSearch = (value: string) => {
     setSearchValue(value);
   };
+
+  const handleSelectLicenseType = (selected: string) => {
+    const typeOfLicense = typeOfLicenses.find((item) => item.id === selected);
+    if (!typeOfLicense) return;
+    setLicenseType(typeOfLicense);
+    if (typeOfLicense.id === "all") {
+      setSearchResult(onlineRegistrations);
+      return;
+    }
+    const filtered = onlineRegistrations.filter(
+      (item) =>
+        item.studentInfor.personalData.licenseType === typeOfLicense?.name
+    );
+    setSearchResult(filtered);
+  };
   return (
     <div className="ManageProfile-approve">
       <TabsContent value="list">
@@ -151,12 +168,10 @@ const ProfileList = () => {
               </div>
               <div className="ManageProfile-type">
                 <Selection
-                  placeholder={licenseType?.name}
+                  placeholder={"Vui lòng chọn loại bằng lái"}
                   data={typeOfLicenses}
-                  setData={(type) => {
-                    setLicenseType(type);
-                    handleFilterByLicenseType();
-                  }}
+                  setData={handleSelectLicenseType}
+                  value={licenseType?.id}
                 ></Selection>
               </div>
             </div>

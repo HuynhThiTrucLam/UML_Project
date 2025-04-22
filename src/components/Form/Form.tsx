@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { PersonalData } from "../../store/type/Student";
 import {
+  calculateAge,
   isValidDate,
   isValidEmail,
   isValidPhone,
+  MIN_AGE_BY_LICENSE_TYPE,
 } from "../../utils/validation";
 import Button from "../Button/Button";
 import ChooseDayForm from "./Features/ChooseDayForm";
@@ -12,6 +14,8 @@ import UploadForm from "./Features/UploadForm";
 import "./Form.scss";
 import axios from "axios";
 import { toast } from "sonner";
+import { useAuth } from "../../store/AuthContext";
+import { decodeJWT } from "../../lib/utils";
 
 const tabs = [
   "Thông tin cá nhân",
@@ -20,6 +24,7 @@ const tabs = [
 ];
 
 const Form = () => {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<number>(0);
   const [personalData, setPersonalData] = useState<PersonalData | null>(null);
   const [personalImgData, setPersonalImgData] = useState({
@@ -67,26 +72,103 @@ const Form = () => {
     }));
   };
 
+  // Create a new function for age validation specifically
+  const validateAgeRequirement = (
+    birthDate: string,
+    licenseType: string
+  ): { valid: boolean; message?: string } => {
+    // Add more comprehensive validation
+    if (!birthDate || !licenseType) {
+      return {
+        valid: false,
+        message: "Vui lòng nhập ngày sinh và chọn loại bằng lái",
+      };
+    }
+
+    // Ensure birth date is in DD/MM/YYYY format
+    if (!isValidDate(birthDate)) {
+      return {
+        valid: false,
+        message: "Ngày sinh không hợp lệ! Định dạng hợp lệ: DD/MM/YYYY",
+      };
+    }
+
+    const age = calculateAge(birthDate);
+    const requiredAge = MIN_AGE_BY_LICENSE_TYPE[licenseType];
+
+    if (!requiredAge) {
+      return {
+        valid: false,
+        message: `Không tìm thấy yêu cầu tuổi cho bằng lái hạng ${licenseType}`,
+      };
+    }
+
+    // For debugging
+    console.log(`Validating age for license type ${licenseType}:`);
+    console.log(`- Birth date: ${birthDate}`);
+    console.log(`- Calculated age: ${age}`);
+    console.log(`- Required age: ${requiredAge}`);
+
+    if (age < requiredAge) {
+      return {
+        valid: false,
+        message: `Tuổi của bạn (${age} tuổi) không đủ điều kiện để đăng ký. Yêu cầu tối thiểu là ${requiredAge} tuổi.`,
+      };
+    }
+
+    return { valid: true };
+  };
+
   const validatePersonalInfo = () => {
-    if (!personalData?.name) {
+    if (!personalData) {
+      alert("Vui lòng nhập đầy đủ thông tin cá nhân!");
+      return false;
+    }
+
+    if (!personalData.name) {
       alert("Họ và tên không được để trống!");
       return false;
     }
+
+    if (!personalData.birthDate) {
+      alert("Ngày sinh không được để trống!");
+      return false;
+    }
+
     if (!isValidDate(personalData.birthDate)) {
       alert("Ngày sinh không hợp lệ! Định dạng hợp lệ: DD/MM/YYYY");
       return false;
     }
+
+    if (!personalData.licenseType) {
+      alert("Vui lòng chọn loại bằng lái!");
+      return false;
+    }
+
     if (!isValidPhone(personalData.phone)) {
       alert("Số điện thoại không hợp lệ!");
       return false;
     }
+
     if (personalData.email && !isValidEmail(personalData.email)) {
       alert("Email không hợp lệ!");
       return false;
     }
 
+    // Use the new age validation function
+    const ageValidation = validateAgeRequirement(
+      personalData.birthDate,
+      personalData.licenseType
+    );
+
+    if (!ageValidation.valid) {
+      alert(ageValidation.message);
+      return false;
+    }
+
     return true;
   };
+
   const validateUploadForm = () => {
     console.log("personalImgData", personalImgData);
     if (
@@ -110,6 +192,10 @@ const Form = () => {
 
   const handleSummit = async () => {
     try {
+      const token = user?.token;
+      const decodedToken: any = decodeJWT(token);
+      const role = decodedToken?.role;
+      console.info(decodedToken);
       var studentInformation = {
         identity_number: personalData?.identityNumber,
         full_name: personalData?.name,
@@ -124,7 +210,7 @@ const Form = () => {
         avatar: personalImgData.avatar,
         course_id: chooseData.courseId,
         health_check_schedule_id: chooseData.healthCheckId,
-        role: "user",
+        role: role ?? "user",
       };
       console.log("studentInformation", studentInformation);
       const response = await axios.post(

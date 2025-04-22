@@ -19,12 +19,14 @@ import { Profile } from "../../../store/type/Profile";
 import "../AdminDashboard.scss";
 import RegisterateDetail from "../Detail/RegisterateDetail";
 import axios from "axios";
+import { Skeleton } from "../../../components/ui/skeleton";
 
 const ProfileOnlineList = () => {
   const [typeOfLicenses, setTypeOfLicenses] = useState<LicenseType[]>([]);
   const [searchValue, setSearchValue] = useState("");
   const [searchResult, setSearchResult] = useState<Profile[]>([]);
   const [onlineRegistrations, setOnlineRegistrations] = useState<Profile[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [licenseType, setLicenseType] = useState<LicenseType>(
     typeOfLicenses[0]
   );
@@ -71,11 +73,12 @@ const ProfileOnlineList = () => {
     const filtered = onlineRegistrations.filter(
       (item) => item.studentInfor.personalData.licenseType === licenseType?.name
     );
-    setOnlineRegistrations(filtered);
+    setSearchResult(filtered);
   };
 
   const getTypeOfLicense = async () => {
     try {
+      setIsLoading(true);
       const response = await axios.get(
         import.meta.env.VITE_API_URL + "/api/license_type/?skip=0&limit=100"
       );
@@ -84,10 +87,14 @@ const ProfileOnlineList = () => {
         name: item.type_name,
       }));
       // return licenseTypes;
-      setTypeOfLicenses(licenseTypes);
+      const data = [{ id: "all", name: "Tất cả" }, ...licenseTypes];
+      setTypeOfLicenses(data);
+      setLicenseType(data[0]);
     } catch (error) {
       console.error("Error fetching license types:", error);
       return [];
+    } finally {
+      setIsLoading(false);
     }
   };
   const RetrieveListOnlineRegistration = async () => {
@@ -125,6 +132,21 @@ const ProfileOnlineList = () => {
   const onSearch = (value: string) => {
     setSearchValue(value);
   };
+
+  const handleSelectLicenseType = (selected: string) => {
+    const typeOfLicense = typeOfLicenses.find((item) => item.id === selected);
+    if (!typeOfLicense) return;
+    setLicenseType(typeOfLicense);
+    if (typeOfLicense.id === "all") {
+      setSearchResult(onlineRegistrations);
+      return;
+    }
+    const filtered = onlineRegistrations.filter(
+      (item) =>
+        item.studentInfor.personalData.licenseType === typeOfLicense?.name
+    );
+    setSearchResult(filtered);
+  };
   return (
     <div className="ManageProfile-approve">
       <TabsContent value="approve-online">
@@ -139,14 +161,19 @@ const ProfileOnlineList = () => {
                 ></SearchBar>
               </div>
               <div className="ManageProfile-type">
-                <Selection
-                  placeholder={licenseType?.name}
-                  data={typeOfLicenses}
-                  setData={(type) => {
-                    setLicenseType(type);
-                    handleFilterByLicenseType();
-                  }}
-                ></Selection>
+                {isLoading ? (
+                  <>
+                    <Skeleton className="w-full h-[18px] mb-2" />
+                    <Skeleton className="w-full h-[50px]" />
+                  </>
+                ) : (
+                  <Selection
+                    placeholder={"Vui lòng chọn hạng bằng lái"}
+                    data={typeOfLicenses}
+                    setData={handleSelectLicenseType}
+                    value={licenseType?.id}
+                  ></Selection>
+                )}
               </div>
             </div>
           </CardHeader>

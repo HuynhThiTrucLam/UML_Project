@@ -17,19 +17,8 @@ import {
 import { CourseType } from "../../../store/type/Course";
 import { LicenseType } from "../../../store/type/Lincense";
 import axios from "axios";
-// import CourseDialog from "./CourseDialog";
+import CourseDialog from "./CourseDialog";
 
-// "course_name": "Khóa học A1 nâng cao",
-//     "license_type_id": "2533a434-35c7-47fa-9306-8e45da5ec3b4",
-//     "start_date": "2025-05-01",
-//     "end_date": "2025-06-30",
-//     "max_students": 30,
-//     "price": 2500000,
-//     "status": "active",
-//     "id": "5b1df47f-46d5-4c54-a237-b1e23eb914b9",
-//     "current_students": 10,
-//     "created_at": "2025-04-20",
-//     "updated_at": "2025-04-20"
 const CourseTable = () => {
   const [courses, setCourses] = useState<CourseType[]>([]);
   const typeOfLicense: LicenseType[] = [
@@ -40,29 +29,64 @@ const CourseTable = () => {
   ];
   const [licenseType, setLicenseType] = useState<LicenseType>(typeOfLicense[0]);
   const [searchString, setSearchString] = useState<string>("");
+  const [openDialog, setOpenDialog] = useState(false);
+  const [editCourse, setEditCourse] = useState<CourseType | undefined>(
+    undefined
+  );
 
-  const handleDeleteCourse = (courseId: string) => {
-    console.log("Xoá course", courseId);
-    setCourses((prev) => prev.filter((course) => course.id !== courseId));
+  const handleDeleteCourse = async (courseId: string) => {
+    try {
+      await axios.delete(
+        `${import.meta.env.VITE_API_URL}/api/courses/${courseId}`
+      );
+      setCourses((prev) => prev.filter((course) => course.id !== courseId));
+    } catch (error) {
+      console.error("Error deleting course:", error);
+    }
+  };
+
+  const handleEditCourse = (course: CourseType) => {
+    setEditCourse(course);
+    setOpenDialog(true);
   };
 
   const handleSearch = (searchString: string) => {
     console.log("Search course", searchString);
+    // Implement search functionality
   };
 
   const handleFilterCoursesByType = (typeId: string) => {
     if (typeId === "0") {
       //Call API to get all courses
-      console.log("Get all course", typeId);
-      // setCourses(mockCourses);
+      retrieveListCourses();
       return;
     }
 
-    console.log("GetCourseById", typeId);
-    // const filtered = mockCourses.filter(
-    //   (course) => course.licenseType.id === typeId
-    // );
-    // setCourses(filtered);
+    // Filter by license type
+    retrieveListCoursesByType(typeId);
+  };
+
+  const retrieveListCoursesByType = async (typeId: string) => {
+    try {
+      const response = await axios.get(
+        `${
+          import.meta.env.VITE_API_URL
+        }/api/courses/?license_type=${typeId}&skip=0&limit=100`
+      );
+      const courses = response.data.items.map((item: any) => ({
+        id: item.id.split("-")[1],
+        name: item.course_name,
+        licenseType: item.license_type,
+        startDate: item.start_date,
+        endDate: item.end_date,
+        registeredCount: item.current_students,
+        maxStudents: item.max_students,
+        examDate: item.exam_date,
+      }));
+      setCourses(courses);
+    } catch (error) {
+      console.error("Error fetching courses:", error);
+    }
   };
 
   const retrieveListCourses = async () => {
@@ -114,6 +138,15 @@ const CourseTable = () => {
                 }}
               />
             </div>
+            <Button
+              text="Thêm mới"
+              isPrimary
+              className="!w-fit h-[50px]"
+              onClick={() => {
+                setEditCourse(undefined);
+                setOpenDialog(true);
+              }}
+            />
           </div>
 
           <Table className="File-table border-collapse">
@@ -159,19 +192,17 @@ const CourseTable = () => {
                   <TableCell className="text-center border">
                     {`${course.registeredCount}/${course.maxStudents}`}
                   </TableCell>
-                  {/* <TableCell className="text-center border">
-                    {`${course.theoryLessons} LT + ${course.practiceLessons} TH`}
-                  </TableCell> */}
-                  <TableCell className="text-center border">
-                    {course.endDate}
-                  </TableCell>
                   <TableCell className="flex justify-center gap-2 text-center border">
+                    <Button
+                      text="Sửa"
+                      isPrimary
+                      onClick={() => handleEditCourse(course)}
+                    />
                     <Button
                       text="Xoá"
                       isPrimary={false}
                       onClick={() => handleDeleteCourse(course.id)}
                     />
-                    {/* <CourseDialog mode="edit" initialData={course} /> */}
                   </TableCell>
                 </TableRow>
               ))}
@@ -184,6 +215,14 @@ const CourseTable = () => {
               )}
             </TableBody>
           </Table>
+
+          <CourseDialog
+            mode={editCourse ? "edit" : "create"}
+            open={openDialog}
+            onOpenChange={setOpenDialog}
+            initialData={editCourse}
+            onSuccess={retrieveListCourses}
+          />
         </CardContent>
       </Card>
     </div>
