@@ -16,6 +16,7 @@ interface SelectionProps {
   setData: (data: any) => void;
   lable?: string;
   title?: string | null;
+  disabled?: boolean;
 }
 
 const Selection = ({
@@ -25,6 +26,7 @@ const Selection = ({
   title,
   setData,
   value,
+  disabled = false,
 }: SelectionProps) => {
   const handleValueChange = (val: string) => {
     if (val) {
@@ -40,12 +42,13 @@ const Selection = ({
           {title ? title : "Lọc bằng hạng bằng lái"}
         </p>
       )}
-      <Select onValueChange={handleValueChange}>
+      <Select onValueChange={handleValueChange} disabled={disabled}>
         <SelectTrigger className="Selection-header">
           <SelectValue
             placeholder={
               data.find((item: any) => item.id === value)?.name || placeholder
             }
+            className={`${disabled ? "bg-gray-400" : ""}`}
           />
         </SelectTrigger>
         <SelectContent className="Selection-container">

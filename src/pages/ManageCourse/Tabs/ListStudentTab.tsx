@@ -15,6 +15,8 @@ export interface mockStudents {
   name: string;
   theoryScore: string;
   practiceScore: string;
+  courseName?: string;
+  courseId?: string;
 }
 
 export const mockStudents: mockStudents[] = [
@@ -82,7 +84,9 @@ export const mockStudents: mockStudents[] = [
 
 const ListStudentTab = () => {
   const [students, setStudents] = useState<mockStudents[]>([]);
-  const [selectedCourse, setSelectedCourse] = useState<CourseType>();
+  const [studentsFiltered, setStudentsFiltered] = useState<mockStudents[]>([]);
+  const [courses, setCourses] = useState<CourseType[]>([]);
+  const [selectedCourse, setSelectedCourse] = useState<string>();
   const [selectedClass, setSelectedClass] = useState<ClassType>();
   const { user } = useAuth();
 
@@ -94,14 +98,42 @@ const ListStudentTab = () => {
   const handleSearch = () => {
     // Gọi API để lấy danh sách học viên theo mã lớp và mã khoá học
     console.log("courseId", selectedCourse);
-    console.log("classId", selectedClass);
-    setStudents(mockStudents);
+    if (selectedCourse === "0") {
+      return setStudentsFiltered(students);
+    }
+    const filteredStudents = students.filter(
+      (item) => item.courseId === selectedCourse
+    );
+    setStudentsFiltered(filteredStudents);
+  };
+
+  const retrieveListCourses = async () => {
+    try {
+      const response = await axios.get(
+        import.meta.env.VITE_API_URL + "/api/courses/?skip=0&limit=100"
+      );
+      let courses = response.data.items.map((item: any) => ({
+        id: item.id,
+        name: item.course_name,
+        licenseType: item.license_type,
+        startDate: item.start_date?.split("-").reverse().join("/"),
+        endDate: item.end_date?.split("-").reverse().join("/"),
+        registeredCount: item.current_students,
+        maxStudents: item.max_students,
+        price: item.price,
+      }));
+      courses = [{ id: "0", name: "Tất cả" }, ...courses];
+      setCourses(courses);
+      setSelectedCourse(courses[0]);
+    } catch (error) {
+      console.error("Error fetching courses:", error);
+    }
   };
 
   const retrieveStudents = async () => {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/students`,
+        `${import.meta.env.VITE_API_URL}/api/students/registered/`,
         {
           headers: {
             Authorization: `Bearer ${user?.token}`,
@@ -109,13 +141,16 @@ const ListStudentTab = () => {
         }
       );
       if (response.status === 200) {
-        const studentsData = response.data.map((student: any) => ({
-          id: student.id.split("-")[1],
-          name: student.user.user_name,
-          theoryScore: student.theoryScore || "",
-          practiceScore: student.practiceScore || "",
+        let studentsData = response.data.map((student: any) => ({
+          id: student.student_id.split("-")[1],
+          name: student.name,
+          theoryScore: student.theory_score || "",
+          practiceScore: student.practice_score || "",
+          courseName: student.course_name,
+          courseId: student.course_id,
         }));
         setStudents(studentsData);
+        setStudentsFiltered(studentsData);
       }
     } catch (error) {
       console.error("Error retrieving students:", error);
@@ -126,6 +161,7 @@ const ListStudentTab = () => {
   useEffect(() => {
     // Gọi API để lấy danh sách học viên khi component được mount
     retrieveStudents();
+    retrieveListCourses();
   }, []);
   return (
     <div className="ManageCourse-student">
@@ -137,35 +173,29 @@ const ListStudentTab = () => {
                 <h1>Danh sách học viên</h1>
                 <div className="ManageCourse-student-filter">
                   <div className="ManageCourse-student-filter-item">
-                    <p>Chọn mã lớp</p>
-                    <Selection
-                      data={mockTypeOfClassList}
-                      placeholder="Chọn Lớp học"
-                      setData={(selected) => {
-                        setSelectedClass(selected);
-                      }}
-                      value={selectedClass?.id}
-                    />
-                  </div>
-                  <div className="ManageCourse-student-filter-item">
                     <p>Chọn mã khoá học</p>
                     <Selection
-                      data={mockCourseList}
+                      data={courses}
                       placeholder="Chọn Khoá học"
                       setData={(selected) => {
                         setSelectedCourse(selected);
                       }}
-                      value={selectedCourse?.id}
+                      value={selectedCourse}
                     />
                   </div>
-                  <Button text={"Tra cứu"} isPrimary onClick={handleSearch} />
+                  <Button
+                    text={"Tra cứu"}
+                    isPrimary
+                    onClick={handleSearch}
+                    className="h-[50px] !w-30"
+                  />
                 </div>
               </div>
               <div className="ManageCourse-student-content">
                 <p>Danh sách học viên</p>
 
                 <StudentsTable
-                  data={students}
+                  data={studentsFiltered}
                   handlePrint={handlePrint}
                   mode="list"
                 ></StudentsTable>

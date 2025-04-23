@@ -83,6 +83,8 @@ interface InputProps {
   className?: string;
   type?: InputType;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  enabledError?: boolean;
+  disabled?: boolean;
 }
 
 const Input: React.FC<InputProps> = ({
@@ -93,6 +95,8 @@ const Input: React.FC<InputProps> = ({
   className = "",
   type = "text",
   onChange,
+  enabledError = true,
+  disabled = false,
 }) => {
   const [error, setError] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -118,12 +122,15 @@ const Input: React.FC<InputProps> = ({
         <input
           type={inputType}
           value={value}
-          onChange={onChange}
+          onChange={(e) => {
+            onChange(e);
+            handleBlur();
+          }}
           onBlur={handleBlur}
           placeholder={placeholder}
           className={`border border-gray-600 p-2 pr-10 focus:outline-blue-500 w-full ${
             error ? "border-red-500" : ""
-          }`}
+          } ${disabled ? "bg-gray-200 text-gray-500" : ""}`}
           inputMode={
             type === "number"
               ? "numeric"
@@ -131,6 +138,7 @@ const Input: React.FC<InputProps> = ({
               ? "email"
               : undefined
           }
+          disabled={disabled}
         />
         {type === "password" && (
           <button
@@ -143,7 +151,7 @@ const Input: React.FC<InputProps> = ({
           </button>
         )}
       </div>
-      {error && (
+      {enabledError && error && (
         <p className="text-red-500 text-sm mt-1 !important">
           * Không được để trống thông tin này
         </p>

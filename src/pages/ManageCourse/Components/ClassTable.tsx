@@ -179,9 +179,12 @@ const ClassTable = () => {
           id: item.id,
           name: item.name,
           course: {
-            id: item.course.id,
-            name: item.course.name,
-            licenseType: item.license_type,
+            id: item.course_id,
+            name: item.course_name,
+            licenseType: {
+              id: item.license_type_id,
+              type_name: item.license_type_name,
+            },
           },
           date: new Date(item.start_time).toLocaleDateString("vi-VN"),
           startTime: new Date(item.start_time).toLocaleTimeString("vi-VN", {
@@ -203,6 +206,7 @@ const ClassTable = () => {
           },
           location: item.location,
           maxStudents: item.max_students,
+          teacher: item.instructor_id,
         }));
         setClasses(data);
       }
@@ -217,9 +221,10 @@ const ClassTable = () => {
 
   useEffect(() => {
     //Call API to get all classes
-    retriveClasses();
+    if (!classes.length) retriveClasses();
   }, []);
 
+  console.log("classes", classes);
   return (
     <div>
       <Card>
@@ -281,7 +286,7 @@ const ClassTable = () => {
                     {cls.id.split("-")[1]}
                   </TableCell>
                   <TableCell className="text-center border">
-                    {cls.course.id.split("-")[1]}
+                    {cls.course.id?.split("-")[1]}
                   </TableCell>
                   <TableCell className="text-center border">
                     {cls.course?.licenseType?.type_name}

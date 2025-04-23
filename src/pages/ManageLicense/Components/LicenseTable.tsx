@@ -14,87 +14,79 @@ import {
 } from "../../../components/ui/table";
 import { License } from "../../../store/type/Lincense";
 import axios from "axios";
-
-const mockLicenses: License[] = [
-  {
-    id: "1",
-    typeOfLicense: { id: "A1", name: "Giấy phép lái xe A1" }, // A - Motorcycle
-    studentId: "student001",
-    releaseDate: "2023-01-15",
-    endDate: "2028-01-15",
-    expiredDate: "2028-01-15",
-    status: "active",
-  },
-  {
-    id: "2",
-    typeOfLicense: { id: "A2", name: "Giấy phép lái xe A2" }, // B - Car
-    studentId: "student002",
-    releaseDate: "2020-06-10",
-    endDate: "2025-06-10",
-    expiredDate: "2023-06-10",
-    status: "expired",
-  },
-  {
-    id: "3",
-    typeOfLicense: { id: "A1", name: "Giấy phép lái xe A1" }, // C - Truck
-    studentId: "student003",
-    releaseDate: "2022-09-01",
-    endDate: "2027-09-01",
-    expiredDate: "2027-09-01",
-    status: "suspended",
-  },
-  {
-    id: "4",
-    typeOfLicense: { id: "A1", name: "Giấy phép lái xe A1" },
-    studentId: "student004",
-    releaseDate: "2021-03-20",
-    endDate: "2026-03-20",
-    expiredDate: "",
-    status: "revoked",
-  },
-];
+import dayjs from "dayjs";
+import LicenseDialog from "./LicenseDialog";
 
 const LicenseTable = () => {
-  console.log("Filter");
   const [licenses, setLicenses] = useState<License[]>([]);
-
-  const retriveLicenses = async () => {
+  const [licensesFiltered, setLicensesFiltered] = useState<License[]>([]);
+  const [searchValue, setSearchValue] = useState("");
+  const fetchLicenses = async () => {
     try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/license_type/?skip=0&limit=100`
+      let response = await axios.get(
+        import.meta.env.VITE_API_URL + "/api/licenses"
       );
-      const data = response.data.items;
-
-      // {
-      //   "type_name": "Hạng bằng lái A1",
-      //   "age_requirement": "Đủ 18 tuổi trở lên",
-      //   "health_requirements": "Để đủ điều kiện tham gia kỳ thi sát hạch cấp giấy phép lái xe hạng A1 (dành cho xe mô tô hai bánh có dung tích xi-lanh dưới 175 cm³), người dự thi bắt buộc phải đáp ứng các tiêu chuẩn sức khỏe theo quy định hiện hành của Bộ Y tế và Bộ Giao thông Vận tải. Việc kiểm tra sức khỏe này nhằm đảm bảo người lái xe có đủ khả năng về thể chất và tinh thần để điều khiển phương tiện một cách an toàn, không gây nguy hiểm cho bản thân và những người tham gia giao thông khác. Các yêu cầu chính bao gồm tình trạng ổn định về tâm thần kinh (không mắc các bệnh tâm thần cấp tính, động kinh, hoặc các rối loạn có thể ảnh hưởng đến khả năng kiểm soát hành vi), thị lực đảm bảo (đạt mức tối thiểu theo quy định, kể cả khi sử dụng kính điều chỉnh), chức năng vận động của tay, chân đủ để thực hiện các thao tác điều khiển xe (tay lái, phanh, ga...), không bị các dị tật hoặc bệnh lý nghiêm trọng về tim mạch, hô hấp có thể gây ra tình trạng mất kiểm soát đột ngột khi đang lái xe. Ngoài ra, người lái xe không được nghiện các chất kích thích, ma túy. Việc khám sức khỏe phải được thực hiện tại các cơ sở y tế được cấp phép và kết quả khám (Giấy khám sức khỏe dành cho người lái xe) còn hiệu lực là một phần hồ sơ bắt buộc khi đăng ký dự thi bằng lái A1.",
-      //   "training_duration": 2,
-      //   "fee": 1699000,
-      //   "id": "2533a434-35c7-47fa-9306-8e45da5ec3b4"
-      // },
-      const licenses = data.map((license: any) => ({
-        id: license.id,
+      const result = response.data?.map((item: any) => ({
+        id: item.id,
+        licenseNumber: item.license_number,
         typeOfLicense: {
-          id: license.id,
-          name: license.type_name,
+          id: item.license_type_id,
+          name: item.license_type_name,
         },
-        studentId: license.studentId,
-        releaseDate: license.releaseDate,
-        endDate: license.endDate,
-        expiredDate: license.expiredDate,
-        status: license.status,
-      }));
-      setLicenses(licenses);
-    } catch (error) {
-      console.error("Error fetching licenses:", error);
+        studentId: item.student_id,
+        createdAt: dayjs(item.created_at).format("DD/MM/YYYY"),
+        expirationDate: dayjs(item.expiration_date).format("DD/MM/YYYY"),
+        status: item.status,
+        courseId: item.course_id,
+      })) as License[];
+      setLicenses(result);
+      setLicensesFiltered(result);
+    } catch (err) {
+      console.error("Error fetching licenses:", err);
+      // For development, using mock data when API fails
+      // Remove this in production
+      setLicenses([
+        {
+          id: "2",
+          licenseNumber: "DL-20250423-2C4B",
+          typeOfLicense: {
+            id: "d64eb185-9581-4de8-b041-dd7a06449cf1",
+            name: "A1",
+          },
+          studentId: "5c0735a3-b965-443a-a301-290b10f4924d",
+          createdAt: "2025-04-23T01:58:18.104182",
+          expirationDate: "2028-04-22T01:58:18.104182",
+          status: "pending",
+          courseId: "f8e16970-bf12-4485-96ff-c26ff787e04f",
+        },
+      ]);
     }
   };
 
   useEffect(() => {
-    //Call API to get license List
-    setLicenses(mockLicenses);
-  });
+    if (searchValue === "") {
+      setLicensesFiltered(licenses);
+      return;
+    }
+    const filtered = licenses.filter((item) => {
+      const idMatch = item.typeOfLicense.name
+        .toLowerCase()
+        .includes(searchValue.toLowerCase());
+      const nameMatch = item.licenseNumber
+        .toLowerCase()
+        .includes(searchValue.toLowerCase());
+      return idMatch || nameMatch;
+    });
+    setLicensesFiltered(filtered);
+  }, [searchValue, licenses]);
+
+  const handleSearch = (value: string) => {
+    setSearchValue(value);
+  };
+
+  useEffect(() => {
+    fetchLicenses();
+  }, []);
 
   return (
     <div>
@@ -104,8 +96,7 @@ const LicenseTable = () => {
             <div className="ManageLicense-search flex-1">
               <SearchBar
                 placeholder="Tìm kiếm giấy phép"
-                onChange={() => {}}
-                onSearch={() => {}}
+                onChange={handleSearch}
               />
             </div>
           </div>
@@ -144,16 +135,16 @@ const LicenseTable = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {licenses.map((license) => (
+              {licensesFiltered?.map((license) => (
                 <TableRow key={license.id} className="border">
                   <TableCell className="text-center border">
-                    {license.id}
+                    {license.licenseNumber}
                   </TableCell>
                   <TableCell className="text-center border">
-                    {license.typeOfLicense.name}
+                    {license.typeOfLicense?.name}
                   </TableCell>
                   <TableCell className="text-center border">
-                    {license.studentId}
+                    {license.studentId.split("-")[1]}
                   </TableCell>
                   <TableCell className="text-center border">
                     <span
@@ -166,6 +157,8 @@ const LicenseTable = () => {
                           ? "bg-yellow-100 text-yellow-800"
                           : license.status === "revoked"
                           ? "bg-red-100 text-red-800"
+                          : license.status === "pending"
+                          ? "bg-yellow-100 text-yellow-600"
                           : ""
                       }`}
                     >
@@ -173,18 +166,23 @@ const LicenseTable = () => {
                     </span>
                   </TableCell>
                   <TableCell className="text-center border">
-                    {license.releaseDate} - {license.endDate}
+                    {license.createdAt} - {license.expirationDate}
                   </TableCell>
                   <TableCell className="text-center border">
-                    {license.expiredDate ? license.expiredDate : "Chưa có"}
+                    {license.expirationDate
+                      ? license.expirationDate
+                      : "Chưa có"}
                   </TableCell>
                   <TableCell className="flex gap-2 text-center border">
-                    <Button text="Sửa" isPrimary={false} onClick={() => {}} />
-                    <Button text="Xoá" isPrimary={true} onClick={() => {}} />
+                    <LicenseDialog
+                      mode="edit"
+                      initialData={license}
+                      onUpdate={fetchLicenses}
+                    />
                   </TableCell>
                 </TableRow>
               ))}
-              {licenses.length === 0 && (
+              {licensesFiltered?.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={7} className="text-center py-4">
                     Không có khoá học nào phù hợp.

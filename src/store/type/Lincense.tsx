@@ -5,10 +5,11 @@ export interface LicenseType {
 
 export interface License {
   id: string;
+  licenseNumber: string;
   typeOfLicense: LicenseType;
-  studentId: String;
-  releaseDate: string;
-  endDate: string;
-  expiredDate: string;
+  studentId: string;
+  createdAt: string;
+  expirationDate: string;
+  courseId: string;
   status: string; //(active, expired, suspended, revoked);
 }

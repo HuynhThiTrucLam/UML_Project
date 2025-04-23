@@ -156,4 +156,39 @@
       }
     }
   }
+  &-dialog {
+    width: 100%;
+  }
+
+  &-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  &-form {
+    padding: 1rem 0;
+  }
+
+  &-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  &-select {
+    margin-bottom: 1rem;
+
+    p {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+  }
+
+  &-time {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
 }

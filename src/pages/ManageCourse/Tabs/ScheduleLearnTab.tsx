@@ -36,8 +36,8 @@ const ScheduleLearnTab = () => {
             id: item.id,
             courseId: item.course_id,
             typeOfLicense: {
-              id: item.license_type.id,
-              name: item.license_type.type_name,
+              id: item.license_type?.id,
+              name: item.license_type?.type_name,
             },
             type: item.type,
             startTime: item.start_time,

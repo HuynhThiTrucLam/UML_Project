@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Button from "../../../components/Button/Button";
 import Input from "../../../components/Input/Input";
 import Selection from "../../../components/Select/Select";
@@ -14,29 +14,32 @@ import {
 } from "../../../components/ui/alert-dialog";
 import { ClassType, TypeOfClass } from "../../../store/type/Class";
 import "./ManageClass.scss";
+import axios from "axios";
+import { useAuth } from "../../../store/AuthContext";
+import { toast } from "sonner";
 
 interface ClassDialogProps {
   mode: "add" | "edit";
   initialData?: ClassType;
 }
 
+// Fallback mock data in case API fails
 export const mockCourseList = [
   { id: "1", name: "Bằng A1" },
   { id: "2", name: "Bằng B2" },
 ];
 
 export const mockTypeOfClassList = [
-  { id: "1", name: "Lý thuyết" },
-  { id: "2", name: "Thực hành" },
+  { id: "theory", name: "Lý thuyết" },
+  { id: "practice", name: "Thực hành" },
 ];
 
-const mockTeacherList = [
+export const mockTeacherList = [
   { id: "1", name: "Nguyễn Văn A" },
   { id: "2", name: "Trần Thị B" },
 ];
 
 const useClassForm = (initialData?: ClassType) => {
-  const [name, setName] = useState(initialData?.name || "");
   const [course, setCourse] = useState(initialData?.course.id || "");
   const [date, setDate] = useState(initialData?.date || "");
   const [startTime, setStartTime] = useState(initialData?.startTime || "");
@@ -45,13 +48,12 @@ const useClassForm = (initialData?: ClassType) => {
   const [location, setLocation] = useState(initialData?.location || "");
   const [teacher, setTeacher] = useState(initialData?.teacher || "");
   const [maxStudents, setMaxStudents] = useState(
-    initialData?.maxStudents.toString() || "30"
+    initialData?.maxStudents?.toString() || "30"
   );
 
   const hasChanged = () => {
     if (!initialData) return false;
     return (
-      name !== initialData.name ||
       course !== initialData.course.id ||
       date !== initialData.date ||
       startTime !== initialData.startTime ||
@@ -64,7 +66,6 @@ const useClassForm = (initialData?: ClassType) => {
   };
 
   const getFormData = () => ({
-    name,
     course,
     date,
     startTime,
@@ -77,7 +78,6 @@ const useClassForm = (initialData?: ClassType) => {
 
   return {
     fields: {
-      name,
       course,
       date,
       startTime,
@@ -88,7 +88,6 @@ const useClassForm = (initialData?: ClassType) => {
       maxStudents,
     },
     setters: {
-      setName,
       setCourse,
       setDate,
       setStartTime,
@@ -102,36 +101,212 @@ const useClassForm = (initialData?: ClassType) => {
     getFormData,
   };
 };
-
+const formatTimeToISO = (dateStr: string, timeStr: string) => {
+  const [year, month, day] = dateStr.split("/").reverse();
+  // Ensure month and day are zero-padded
+  const paddedMonth = month.padStart(2, "0");
+  const paddedDay = day.padStart(2, "0");
+  // Create ISO format string
+  return `${year}-${paddedMonth}-${paddedDay}T${timeStr}:00`;
+};
 const ClassDialog = ({ mode, initialData }: ClassDialogProps) => {
   const { fields, setters, hasChanged, getFormData } =
     useClassForm(initialData);
+  const { user } = useAuth();
+  const [open, setOpen] = useState(false);
 
-  const handleSubmit = () => {
+  // State for API data
+  const [courseList, setCourseList] = useState<{ id: string; name: string }[]>(
+    []
+  );
+  const [typeOfClassList, setTypeOfClassList] =
+    useState<{ id: string; name: string }[]>(mockTypeOfClassList);
+  const [teacherList, setTeacherList] = useState<
+    { id: string; name: string }[]
+  >([]);
+  const [isLoading, setIsLoading] = useState({
+    courses: false,
+    classTypes: false,
+    teachers: false,
+  });
+
+  // Fetch courses from API
+  const fetchCourses = async () => {
+    setIsLoading((prev) => ({ ...prev, courses: true }));
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/courses/?skip=0&limit=100`,
+        {
+          headers: {
+            Authorization: `Bearer ${user?.token}`,
+          },
+        }
+      );
+
+      const formattedCourses = response.data.items.map((item: any) => ({
+        id: item.id,
+        name: item.course_name,
+      }));
+
+      setCourseList(formattedCourses);
+    } catch (error) {
+      console.error("Error fetching courses:", error);
+      setCourseList(mockCourseList);
+      toast.error(
+        "Không thể tải danh sách khóa học. Đang sử dụng dữ liệu mặc định.",
+        {
+          duration: 3000,
+        }
+      );
+    } finally {
+      setIsLoading((prev) => ({ ...prev, courses: false }));
+    }
+  };
+
+  // Fetch teachers from API
+  const fetchTeachers = async () => {
+    setIsLoading((prev) => ({ ...prev, teachers: true }));
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/instructor/?skip=0&limit=100`,
+        {
+          headers: {
+            Authorization: `Bearer ${user?.token}`,
+          },
+        }
+      );
+
+      const formattedTeachers = response.data.map((item: any) => ({
+        id: item.id,
+        name: `${item.user.user_name}`,
+      }));
+
+      setTeacherList(formattedTeachers);
+    } catch (error) {
+      console.error("Error fetching teachers:", error);
+      setTeacherList(mockTeacherList);
+      toast.error(
+        "Không thể tải danh sách giáo viên. Đang sử dụng dữ liệu mặc định.",
+        {
+          duration: 3000,
+        }
+      );
+    } finally {
+      setIsLoading((prev) => ({ ...prev, teachers: false }));
+    }
+  };
+
+  // Fetch all data when component mounts
+  useEffect(() => {
+    fetchCourses();
+    fetchTeachers();
+  }, []);
+
+  const handleSubmit = async () => {
     const data = getFormData();
 
     if (mode === "add") {
-      console.log("Creating class:", data);
+      try {
+        // Convert startTime to ISO format
+
+        const startTimeISO = formatTimeToISO(data.date, data.startTime);
+        const endTimeISO = formatTimeToISO(data.date, data.endTime);
+        console.log("startTime", startTimeISO);
+        console.log("endTime", startTimeISO);
+        const payload = {
+          course_id: data.course,
+          start_time: startTimeISO,
+          end_time: endTimeISO,
+          type: data.type,
+          location: data.location,
+          instructor_id: data.teacher,
+          max_students: data.maxStudents,
+        };
+
+        const response = await axios.post(
+          `${import.meta.env.VITE_API_URL}/api/schedule/`,
+          payload,
+          {
+            headers: {
+              Authorization: `Bearer ${user?.token}`,
+            },
+          }
+        );
+
+        if (response.status === 201) {
+          toast.success("Tạo lớp học mới thành công!", {
+            duration: 3000,
+          });
+        }
+      } catch (error) {
+        console.error("Error creating class:", error);
+        toast.error("Không thể tạo lớp học. Vui lòng thử lại sau.", {
+          duration: 3000,
+        });
+      }
     } else {
       if (!hasChanged()) {
-        alert("Bạn chưa thay đổi thông tin nào.");
+        toast.info("Bạn chưa thay đổi thông tin nào.", {
+          duration: 3000,
+        });
         return;
       }
+
       if (!initialData?.id) {
-        console.error("Thiếu ID lớp học để cập nhật.");
+        toast.error("Thiếu ID lớp học để cập nhật.", {
+          duration: 3000,
+        });
         return;
       }
-      console.log("Updating class:", { ...data, id: initialData.id });
+
+      try {
+        const startTimeISO = formatTimeToISO(data.date, data.startTime);
+        const endTimeISO = formatTimeToISO(data.date, data.endTime);
+        console.log("startTime", startTimeISO);
+        console.log("endTime", startTimeISO);
+        const payload = {
+          course_id: data.course,
+          start_time: startTimeISO,
+          endTimeISO: endTimeISO,
+          type: data.type,
+          location: data.location,
+          instructor_id: data.teacher,
+          max_students: data.maxStudents,
+        };
+
+        const response = await axios.put(
+          `${import.meta.env.VITE_API_URL}/api/schedule/${initialData.id}`,
+          payload,
+          {
+            headers: {
+              Authorization: `Bearer ${user?.token}`,
+            },
+          }
+        );
+
+        if (response.status === 200) {
+          toast.success("Cập nhật lớp học thành công!", {
+            duration: 3000,
+          });
+        }
+      } catch (error) {
+        console.error("Error updating class:", error);
+        toast.error("Không thể cập nhật lớp học. Vui lòng thử lại sau.", {
+          duration: 3000,
+        });
+      }
     }
+    setOpen(false);
   };
 
   return (
     <div className="ManageClass-dialog">
-      <AlertDialog>
+      <AlertDialog open={open}>
         <AlertDialogTrigger asChild>
           <Button
             text={mode === "add" ? "Tạo lớp học mới" : "Chỉnh sửa lớp học"}
             isPrimary
+            onClick={() => setOpen(true)}
           />
         </AlertDialogTrigger>
 
@@ -140,7 +315,7 @@ const ClassDialog = ({ mode, initialData }: ClassDialogProps) => {
             <AlertDialogTitle className="ManageClass-title">
               {mode === "add"
                 ? "Tạo lớp học mới"
-                : `Chỉnh sửa lớp học ${initialData?.id}`}
+                : `Chỉnh sửa lớp học ${initialData?.id?.split("-")[1]}`}
               <p className="text-[12px] my-1 font-light text-gray-500">
                 Bắt đầu tạo lớp học! Vui lòng nhập các thông tin chi tiết về lớp
                 học bạn muốn tạo.
@@ -152,13 +327,6 @@ const ClassDialog = ({ mode, initialData }: ClassDialogProps) => {
           </AlertDialogHeader>
 
           <AlertDialogDescription className="ManageClass-form w-max max-w-none max-h-[70vh] overflow-auto space-y-4">
-            <Input
-              label="* Tên lớp"
-              placeholder="Nhập tên lớp"
-              onChange={(e) => setters.setName(e.target.value)}
-              value={fields.name}
-            />
-
             <div className="ManageClass-time">
               <Input
                 label="* Giờ bắt đầu"
@@ -183,8 +351,10 @@ const ClassDialog = ({ mode, initialData }: ClassDialogProps) => {
             <div className="ManageClass-select">
               <p>* Lớp thuộc khóa học</p>
               <Selection
-                data={mockCourseList}
-                placeholder="Chọn khóa học"
+                data={courseList}
+                placeholder={
+                  isLoading.courses ? "Đang tải..." : "Chọn khóa học"
+                }
                 setData={setters.setCourse}
                 value={fields.course}
               />
@@ -193,8 +363,10 @@ const ClassDialog = ({ mode, initialData }: ClassDialogProps) => {
             <div className="ManageClass-select">
               <p>* Hình thức lớp học</p>
               <Selection
-                data={mockTypeOfClassList}
-                placeholder="Chọn hình thức học"
+                data={typeOfClassList}
+                placeholder={
+                  isLoading.classTypes ? "Đang tải..." : "Chọn hình thức học"
+                }
                 setData={setters.setType}
                 value={fields.type}
               />
@@ -203,8 +375,10 @@ const ClassDialog = ({ mode, initialData }: ClassDialogProps) => {
             <div className="ManageClass-select">
               <p>* Giáo viên phụ trách</p>
               <Selection
-                data={mockTeacherList}
-                placeholder="Chọn giáo viên"
+                data={teacherList}
+                placeholder={
+                  isLoading.teachers ? "Đang tải..." : "Chọn giáo viên"
+                }
                 setData={setters.setTeacher}
                 value={fields.teacher}
               />
@@ -227,7 +401,9 @@ const ClassDialog = ({ mode, initialData }: ClassDialogProps) => {
           </AlertDialogDescription>
 
           <AlertDialogFooter className="ManageClass-footer">
-            <AlertDialogCancel>Hủy</AlertDialogCancel>
+            <AlertDialogCancel onClick={() => setOpen(false)}>
+              Hủy
+            </AlertDialogCancel>
             <Button
               text={mode === "add" ? "Tạo lớp học" : "Cập nhật lớp học"}
               isPrimary

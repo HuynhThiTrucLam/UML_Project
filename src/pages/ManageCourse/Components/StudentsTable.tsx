@@ -11,6 +11,7 @@ import {
   TableRow,
 } from "../../../components/ui/table";
 import { mockStudents } from "../Tabs/ListStudentTab";
+import { toast } from "sonner";
 import axios from "axios";
 
 interface StudentsTableProps {
@@ -22,40 +23,62 @@ interface StudentsTableProps {
 interface StudentScore {
   studentId: string;
   practiceScore: number;
+  courseId?: string;
 }
 
 const StudentsTable = ({ data, handlePrint, mode }: StudentsTableProps) => {
-  const [editedScores, setEditedScores] = useState<{ [id: string]: number }>(
-    {}
-  );
+  const [editedScores, setEditedScores] = useState<{
+    [id: string]: { courseId?: string; practiceScore: number };
+  }>({});
 
-  const handleScoreChange = (id: string, value: string) => {
+  const handleScoreChange = (id: string, value: string, courseId?: string) => {
     const numberValue = parseFloat(value);
     if (!isNaN(numberValue) && numberValue >= 0 && numberValue <= 10) {
       setEditedScores((prev) => ({
         ...prev,
-        [id]: numberValue,
+        [id]: {
+          courseId: courseId,
+          practiceScore: numberValue,
+        },
       }));
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     // Create array of student scores from editedScores
-    const studentScores: StudentScore[] = Object.entries(editedScores).map(
-      ([studentId, score]) => ({
-        studentId,
-        practiceScore: score,
+    const payload: StudentScore[] = Object.entries(editedScores).map(
+      ([studentId, value]) => ({
+        studentId: studentId,
+        courseId: value.courseId,
+        practiceScore: value.practiceScore,
       })
     );
 
-    if (studentScores.length === 0) {
-      alert("Chưa có điểm nào được thay đổi");
+    if (payload.length === 0) {
+      toast.warning("Chưa có điểm nào được thay đổi", { duration: 3000 });
       return;
     }
 
-    console.log("Submitting scores:", studentScores);
+    console.log("Submitting scores:", payload);
     // Here you would make your API call
-    // apiService.updateStudentScores(studentScores);
+    try {
+      payload.forEach(async (element) => {
+        await axios.put(
+          import.meta.env.VITE_API_URL +
+            `/api/students/registered/${element.studentId}`,
+          {
+            course_id: element.courseId,
+            practical_score: element.practiceScore,
+          }
+        );
+      });
+      toast.success("Cập nhật điểm thành công!", {
+        duration: 5000,
+        className: "[&>[data-icon]]:!text-green-500",
+      });
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -90,7 +113,7 @@ const StudentsTable = ({ data, handlePrint, mode }: StudentsTableProps) => {
                     {index + 1}
                   </TableCell>
                   <TableCell className="text-center border">
-                    {student.id}
+                    {student.id.split("-")[1]}
                   </TableCell>
                   <TableCell className="text-center border">
                     {student.name}
@@ -102,10 +125,15 @@ const StudentsTable = ({ data, handlePrint, mode }: StudentsTableProps) => {
                     {mode === "edit" ? (
                       <input
                         type="number"
+                        max={10}
                         className="w-20 px-2 py-1 border rounded text-center"
                         defaultValue={student.practiceScore}
                         onChange={(e) =>
-                          handleScoreChange(student.id, e.target.value)
+                          handleScoreChange(
+                            student.id,
+                            e.target.value,
+                            student.courseId
+                          )
                         }
                       />
                     ) : (
