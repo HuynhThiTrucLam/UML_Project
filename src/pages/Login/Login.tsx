@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./Login.scss";
 import LoginImage from "../../assets/images/login.png";
 import Logo from "../../assets/images/Logo-blue.png";
@@ -7,6 +7,7 @@ import { Checkbox } from "../../components/ui/checkbox";
 import Button from "../../components/Button/Button";
 import { useAuth } from "../../store/AuthContext";
 import { useNavigate, useLocation } from "react-router-dom";
+import { toast } from "sonner";
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -33,6 +34,21 @@ const Login = () => {
     }
   };
 
+  useEffect(() => {
+    if (error) {
+      toast.error(error, {
+        duration: 3000,
+        style: {
+          backgroundColor: "#f44336",
+          color: "#fff",
+        },
+      });
+      setTimeout(() => {
+        setError("");
+      }, 3000);
+    }
+  }, [error]);
+
   return (
     <div className="Login">
       <div className="Login-container">
@@ -40,6 +56,9 @@ const Login = () => {
           <img src={Logo} alt="Trung tâm đào tạo và sát hạch lái xe" />
           <h1>Đăng nhập vào tài khoản</h1>
           <Input
+            type="text"
+            value={username}
+            isForce={true}
             label="Tên đăng nhập"
             placeholder="Tên đăng nhập"
             className="Login-input"
@@ -53,12 +72,14 @@ const Login = () => {
             placeholder="Mật khẩu"
             className="Login-input"
             type="password"
+            isForce={true}
+            value={password}
             onChange={(e) => {
               setPassword(e.target.value);
               setError("");
             }}
           />
-          {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+          {/* {error && <p className="text-red-500 text-sm mt-1">{error}</p>} */}
           <div className="flex items-center space-x-2">
             <Checkbox id="terms" />
             <label

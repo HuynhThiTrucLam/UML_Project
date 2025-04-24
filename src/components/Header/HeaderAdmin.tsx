@@ -1,5 +1,7 @@
 import Avartar from "../../assets/icons/Avaratr";
 import Notification from "../../assets/icons/Notification";
+import { useAuth } from "../../store/AuthContext";
+import Button from "../Button/Button";
 import SearchBar from "../Searchbar/SearchBar";
 import "./HeaderAdmin.scss";
 
@@ -9,6 +11,7 @@ const mockUser = {
 };
 
 const HeaderAdmin = () => {
+  const { logout } = useAuth();
   return (
     <div className="AdminHeader">
       <div className="AdminHeader-container">
@@ -31,7 +34,14 @@ const HeaderAdmin = () => {
           </div>
         </div>
         <div className="AdminHeader-notification">
-          <Notification />
+          {/* <Notification /> */}
+          <Button
+            text="Đăng xuất"
+            onClick={() => {
+              logout();
+              window.location.href = "/admin/login";
+            }}
+          ></Button>
         </div>
       </div>
     </div>

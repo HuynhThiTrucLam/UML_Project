@@ -102,7 +102,9 @@ const Input: React.FC<InputProps> = ({
   const [showPassword, setShowPassword] = useState(false);
 
   const handleBlur = () => {
-    setError((value ?? "").trim() === "");
+    const isError = (value ?? "").trim() === "";
+    console.log("value", value);
+    setError(isError);
   };
 
   const togglePasswordVisibility = () => {
@@ -124,7 +126,6 @@ const Input: React.FC<InputProps> = ({
           value={value}
           onChange={(e) => {
             onChange(e);
-            handleBlur();
           }}
           onBlur={handleBlur}
           placeholder={placeholder}

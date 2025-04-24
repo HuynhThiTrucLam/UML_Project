@@ -34,7 +34,7 @@ const Fee = () => {
     }
   };
 
-  // Check if profileId exists in data
+  // // Check if profileId exists in data
   const handleCheckProfileId = async () => {
     try {
       const response = await axios.get(
@@ -111,17 +111,18 @@ const Fee = () => {
 
   const getPaymentMethod = async () => {
     try {
-      const response = await fetch(
+      const response = await axios.get(
         import.meta.env.VITE_API_URL +
           "/api/payment_method/payment-methods/?skip=0&limit=100"
       );
-      const data = await response.json();
+      const data = response.data;
       console.log(data);
-      const paymentMethods = data.payment_methods.map((item: any) => ({
+      const paymentMethods = data.map((item: any) => ({
         id: item.id,
         name: item.method,
       }));
       setPaymentMethod(paymentMethods);
+      setSelectedPaymentMethod(paymentMethods[0]?.id || null);
     } catch (error) {
       console.error("Error fetching payment methods:", error);
     }
